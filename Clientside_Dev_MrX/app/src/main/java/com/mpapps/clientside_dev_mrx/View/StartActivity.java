@@ -1,4 +1,4 @@
-package com.mpapps.clientside_dev_mrx;
+package com.mpapps.clientside_dev_mrx.View;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -9,6 +9,8 @@ import com.firebase.ui.auth.IdpResponse;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.messaging.FirebaseMessaging;
+import com.mpapps.clientside_dev_mrx.FirebaseMessagingService;
+import com.mpapps.clientside_dev_mrx.R;
 import com.mpapps.clientside_dev_mrx.Volley.Requests;
 
 import java.util.ArrayList;
@@ -44,7 +46,8 @@ public class StartActivity extends AppCompatActivity {
                         .createSignInIntentBuilder()
                         .setAvailableProviders(providers)
                         .enableAnonymousUsersAutoUpgrade()
-                        .setLogo(R.mipmap.ic_launcher)
+                        .setTheme(R.style.LoginTheme)
+                        .setLogo(R.drawable.mister_x_title_full)
                         .build(),
                 RC_SIGN_IN);
     }
