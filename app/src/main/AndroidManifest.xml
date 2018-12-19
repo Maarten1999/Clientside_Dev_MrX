@@ -2,6 +2,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.mpapps.clientside_dev_mrx">
 
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -9,7 +13,13 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".StartActivity">
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyAP7iDAT7ADdRjErFm6d1WZz5R4ybO4nd8" />
+
+        <activity android:name=".View.StartActivity"></activity>
+        <activity android:name=".View.NewGameActivity" />
+        <activity android:name=".View.MapActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
