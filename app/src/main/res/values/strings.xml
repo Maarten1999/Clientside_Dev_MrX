@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">Clientside_Dev_MrX</string>
-    <string name="title_activity_maps2">Map</string>
+    <string name="channel_id">Clientside_Dev_MrX</string>
+    <string name="channel_description">the channel tat receives messages</string>
 </resources>
