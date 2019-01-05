@@ -1,8 +1,10 @@
 package com.mpapps.clientside_dev_mrx.View;
 
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.IdpResponse;
@@ -11,6 +13,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.mpapps.clientside_dev_mrx.FirebaseMessagingService;
 import com.mpapps.clientside_dev_mrx.R;
+import com.mpapps.clientside_dev_mrx.ViewModels.StartActivityVM;
 import com.mpapps.clientside_dev_mrx.Volley.Requests;
 
 import java.util.ArrayList;
@@ -18,12 +21,20 @@ import java.util.Arrays;
 import java.util.List;
 
 public class StartActivity extends AppCompatActivity {
+    private final String TAG = "StartActivityTest";
     private static final int RC_SIGN_IN = 123;
+    private StartActivityVM viewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start);
+        viewModel = ViewModelProviders.of(this).get(StartActivityVM.class);
+
+        viewModel.getGameModels().observe(this, gameModels -> {
+            assert gameModels != null;
+            Log.d(TAG, gameModels.toString());
+        });
 
         FirebaseMessagingService.getToken();
 
@@ -32,7 +43,8 @@ public class StartActivity extends AppCompatActivity {
 
         Requests.createMessagingGroup("volley_test", strings, getApplicationContext());
 
-        createSignInIntent();
+        //if(FirebaseAuth.getInstance().getCurrentUser() == null)
+            createSignInIntent();
     }
 
     private void createSignInIntent() {

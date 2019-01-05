@@ -103,7 +103,7 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
                     Log.i("LOG_RESPONSE", response);
                 }
             }, new Response.ErrorListener() {
-                @Override
+                   @Override
                 public void onErrorResponse(VolleyError error) {
                     Log.e("LOG_RESPONSE", error.toString());
                 }
