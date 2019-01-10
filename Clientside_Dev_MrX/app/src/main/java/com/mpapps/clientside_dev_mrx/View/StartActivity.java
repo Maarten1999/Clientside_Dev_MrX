@@ -13,6 +13,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.mpapps.clientside_dev_mrx.FirebaseMessagingService;
 import com.mpapps.clientside_dev_mrx.R;
+import com.mpapps.clientside_dev_mrx.View.Adapters.GameListAdapter;
 import com.mpapps.clientside_dev_mrx.ViewModels.StartActivityVM;
 import com.mpapps.clientside_dev_mrx.Volley.Requests;
 
@@ -24,6 +25,7 @@ public class StartActivity extends AppCompatActivity {
     private final String TAG = "StartActivityTest";
     private static final int RC_SIGN_IN = 123;
     private StartActivityVM viewModel;
+    private GameListAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +37,9 @@ public class StartActivity extends AppCompatActivity {
             assert gameModels != null;
             Log.d(TAG, gameModels.toString());
         });
+
+
+
 
         FirebaseMessagingService.getToken();
 

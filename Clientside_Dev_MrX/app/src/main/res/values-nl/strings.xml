@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Clientside_Dev_MrX</string>
+    <string name="gamemode_easy_description">Speelduur: 15 min - GPS Tracker: 2 min</string>
+    <string name="gamemode_normal_description">Speelduur: 1 uur - GPS Tracker: 5 min</string>
+    <string name="gamemode_hard_description">Speelduur: 2 uur - GPS Tracker: 10 min</string>
+    <string name="gamemode_misterx_description">Speelduur: 4 uur - GPS Tracker: 10 min</string>
+    <string name="gamemode_easy_title">Easy Modus</string>
+    <string name="gamemode_normal_title">Normale Modus</string>
+    <string name="gamemode_hard_title">Moeilijke Modus</string>
+    <string name="gamemode_misterx_title">MisterX Modus</string>
+</resources>
