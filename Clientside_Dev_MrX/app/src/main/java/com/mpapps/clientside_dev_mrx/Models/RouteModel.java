@@ -2,7 +2,7 @@ package com.mpapps.clientside_dev_mrx.Models;
 
 import com.google.android.gms.maps.model.LatLng;
 
-import java.util.List;
+import java.util.ArrayList;
 
 public class RouteModel
 {
@@ -12,7 +12,7 @@ public class RouteModel
     private LatLng endLocation;
     private LatLng startLocation;
     private String startAddress;
-    private List<RouteStep> routeSteps;
+    private ArrayList<RouteStep> routeSteps;
 
     public RouteModel(int distanceMeter, int durationSec, String endAddress, LatLng endLocation,
                       LatLng startLocation, String startAddress)
@@ -55,12 +55,12 @@ public class RouteModel
         return startAddress;
     }
 
-    public List<RouteStep> getRouteSteps()
+    public ArrayList<RouteStep> getRouteSteps()
     {
         return routeSteps;
     }
 
-    public void setRouteSteps(List<RouteStep> routeSteps)
+    public void setRouteSteps(ArrayList<RouteStep> routeSteps)
     {
         this.routeSteps = routeSteps;
     }

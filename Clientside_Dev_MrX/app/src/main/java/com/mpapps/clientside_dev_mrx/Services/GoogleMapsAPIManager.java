@@ -10,6 +10,12 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
+import android.util.Log;
+
+import com.google.android.gms.maps.model.LatLng;
+import com.mpapps.clientside_dev_mrx.Models.RouteModel;
+import com.mpapps.clientside_dev_mrx.Models.TravelMode;
+import com.mpapps.clientside_dev_mrx.Volley.Requests;
 
 public class GoogleMapsAPIManager
 {
@@ -24,6 +30,7 @@ public class GoogleMapsAPIManager
 
     private Application application;
     private MutableLiveData<Location> userCurrentLocation;
+    private MutableLiveData<RouteModel> userCurrentRoute;
     private LocationManager locationManager;
     private LocationListener locationListener;
 
@@ -32,13 +39,14 @@ public class GoogleMapsAPIManager
         this.application = application;
 
         userCurrentLocation = new MutableLiveData<>();
+        userCurrentRoute = new MutableLiveData<>();
         locationManager = (LocationManager) application.getSystemService(Context.LOCATION_SERVICE);
         locationListener = new LocationListener()
         {
             @Override
             public void onLocationChanged(Location location)
             {
-                userCurrentLocation.setValue(location);
+                userCurrentLocation.postValue(location);
             }
 
             @Override
@@ -74,5 +82,29 @@ public class GoogleMapsAPIManager
     public MutableLiveData<Location> getUserCurrentLocation()
     {
         return userCurrentLocation;
+    }
+
+    public MutableLiveData<RouteModel> getUserCurrentRoute(){
+        return userCurrentRoute;
+    }
+
+    public void calculateRoute(LatLng dest, TravelMode travelMode){
+        Location currentLoc = null;
+        if (ActivityCompat.checkSelfPermission(application, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(application, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            while (currentLoc == null) {
+                currentLoc = locationManager.getLastKnownLocation(LocationManager.PASSIVE_PROVIDER);
+            }
+        }
+
+        LatLng currentLocLatLng = new LatLng(currentLoc.getLatitude(), currentLoc.getLongitude());
+        Requests.getRouteRequest(application, currentLocLatLng, dest, travelMode,
+                response ->
+                {
+                    RouteModel routeModel = JsonDecoder.parseRoute(response);
+                    userCurrentRoute.postValue(routeModel);
+                }, error -> {
+                    Log.i("Route", "Failed");
+                });
     }
 }

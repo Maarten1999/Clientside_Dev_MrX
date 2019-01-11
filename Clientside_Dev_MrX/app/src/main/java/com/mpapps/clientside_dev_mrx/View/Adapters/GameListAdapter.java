@@ -226,7 +226,7 @@ public class GameListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             nameList.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false));
             itemView.setOnClickListener(view -> {
                 GameModel model = (new ArrayList<>(gameModels.get("current").keySet())).get(getAdapterPosition());
-                CurrentGameInstance.initialize(model, new ArrayList<>());
+                CurrentGameInstance.initialize(model);
                 Intent intent = new Intent(context, DetailedGameActivity.class);
                 context.startActivity(intent);
             });

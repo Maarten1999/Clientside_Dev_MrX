@@ -4,21 +4,23 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/firebase_login_background_gradient"
     tools:context=".View.MapActivity">
 
-    <LinearLayout
-        android:id="@+id/linearLayout"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:orientation="horizontal"
-        app:layout_constraintBottom_toTopOf="@+id/guideline">
+    <!--<LinearLayout-->
+        <!--android:id="@+id/linearLayout"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="0dp"-->
+        <!--android:orientation="horizontal"-->
+        <!--app:layout_constraintBottom_toTopOf="@+id/guideline">-->
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/map_activity_recyclerview"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="horizontal" />
-    </LinearLayout>
+            android:layout_height="0dp"
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toTopOf="@+id/guideline"/>
+    <!--</LinearLayout>-->
 
     <com.google.android.gms.maps.MapView
         android:id="@+id/map_activity_mapview"
@@ -35,4 +37,46 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         app:layout_constraintGuide_percent="0.20" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/map_activity_fab_plus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="16dp"
+        android:src="@drawable/action_plus_white"
+        app:backgroundTint="@color/colorPrimaryLight"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:elevation="6dp"
+        app:pressedTranslationZ="12dp"/>
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/map_activity_fab_route"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="16dp"
+        android:src="@drawable/ic_nav_routes"
+        app:backgroundTint="@android:color/white"
+        app:layout_constraintBottom_toTopOf="@id/map_activity_fab_misterx"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:elevation="6dp"
+        app:pressedTranslationZ="12dp"
+        android:visibility="invisible"/>
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/map_activity_fab_misterx"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="16dp"
+        android:src="@drawable/mister_x"
+        app:backgroundTint="@android:color/white"
+        app:layout_constraintBottom_toTopOf="@id/map_activity_fab_plus"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:elevation="6dp"
+        app:pressedTranslationZ="12dp"
+        android:visibility="invisible"/>
+
 </android.support.constraint.ConstraintLayout>

@@ -5,6 +5,8 @@ import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
@@ -76,7 +78,12 @@ public class StartActivity extends AppCompatActivity {
 
         Button joinGame = findViewById(R.id.start_activity_btn_join_game);
         joinGame.setOnClickListener(view -> {
-            //TODO join game fragment
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            Fragment fragment = fragmentManager.findFragmentById(R.id.start_activity_fragment_placeholder);
+            if(fragment == null){
+                JoinGameFragment joinGameFragment = JoinGameFragment.newInstance();
+                joinGameFragment.show(fragmentManager, "FRAGMENT_JOIN_GAME");
+            }
         });
     }
 

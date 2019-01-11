@@ -1,15 +1,16 @@
 package com.mpapps.clientside_dev_mrx.Volley;
 
 import android.content.Context;
+import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.util.Log;
-import android.view.textclassifier.TextLinks;
 
-import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.JsonRequest;
+import com.google.android.gms.maps.model.LatLng;
+import com.mpapps.clientside_dev_mrx.Models.TravelMode;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -17,6 +18,7 @@ import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 public class Requests {
@@ -65,5 +67,39 @@ public class Requests {
 
         // Access the RequestQueue through your singleton class.
         VolleyRequestQueue.getInstance(context).addToRequestQueue(jsonObjectRequest);
+    }
+
+    public static void getRouteRequest(Context context, LatLng start, LatLng dest, TravelMode travelMode, Response.Listener<JSONObject> onSuccess, Response.ErrorListener onError){
+        String url = getRouteUrl(start, dest, travelMode, context);
+        JsonObjectRequest request = new JsonObjectRequest(
+                Request.Method.GET,
+                url,
+                null,
+                onSuccess,
+                onError
+        );
+        VolleyRequestQueue.getInstance(context).addToRequestQueue(request);
+    }
+
+    private static String getRouteUrl(LatLng startLocation, LatLng endLocation, TravelMode travelMode, Context context)
+    {
+        String str_origin = "origin=" + startLocation.latitude + "," + startLocation.longitude;
+        String str_dest = "destination=" + endLocation.latitude + "," + endLocation.longitude;
+
+        String trafficMode = "mode=" + travelMode.toString();
+
+        Resources res = context.getResources();
+        Configuration conf = res.getConfiguration();
+        Locale myLocale = conf.locale;
+        String language = myLocale.getLanguage();
+        if(language == "")
+            language = "en";
+        language = "language=" + language;
+        // Building the parameters to the web service
+        String parameters = str_origin + "&" + str_dest + "&" + trafficMode + "&" + language;
+
+        // Building the url to the web service
+        String url3 = "https://maps.moviecast.io/directions?" + parameters + "&key=cb0dd035-f9e5-47d6-a4ad-d613bd1c6d1d";
+        return url3;
     }
 }

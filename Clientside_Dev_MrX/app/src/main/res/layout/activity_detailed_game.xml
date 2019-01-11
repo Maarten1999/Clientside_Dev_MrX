@@ -52,9 +52,8 @@
             android:layout_height="wrap_content"
             android:text="@string/gamecode_is"
             android:textAlignment="center"
-            android:textColor="@color/editTextHint"
-            tools:layout_editor_absoluteX="163dp"
-            tools:layout_editor_absoluteY="53dp" />
+            android:layout_marginTop="4dp"
+            android:textColor="@color/editTextHint" />
 
         <TextView
             android:id="@+id/detailed_game_activity_textview_gamecode"
@@ -66,7 +65,8 @@
             android:textSize="36sp"
             android:textStyle="bold"
             android:maxLines="1"
-            android:maxLength="4"/>
+            android:maxLength="4"
+            android:layout_marginBottom="4dp"/>
     </LinearLayout>
 
     <TextView

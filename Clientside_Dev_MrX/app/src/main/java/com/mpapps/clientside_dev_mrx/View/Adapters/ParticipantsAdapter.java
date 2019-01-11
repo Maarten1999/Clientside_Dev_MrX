@@ -9,22 +9,22 @@ import android.view.ViewGroup;
 import android.widget.RadioButton;
 import android.widget.TextView;
 
-import com.mpapps.clientside_dev_mrx.Models.Player;
 import com.mpapps.clientside_dev_mrx.R;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 public class ParticipantsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 {
     private Context context;
-    private List<Player> players;
-    private int lastSelectedPos = -1;
+    private Map<String,Boolean> players;
+    private String lastSelectedName = "";
 
     public ParticipantsAdapter(Context context)
     {
         this.context = context;
-        this.players = new ArrayList<>();
+        this.players = new LinkedHashMap<>();
     }
 
     @NonNull
@@ -52,10 +52,17 @@ public class ParticipantsAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             }
             default: {
                 ViewHolder holder = (ViewHolder) viewHolder;
-                Player player = players.get(i - 1);
-                holder.name.setText(player.getName());
-                holder.initials.setText(player.getInitials());
-                holder.misterX.setChecked(player.isMisterX());
+                String name = new ArrayList<>(players.keySet()).get(i - 1);
+                String initials = "";
+                if (name.contains(" ")) {
+                    String[] names = name.split("\\s+");
+                    initials += names[0].substring(0,1) + names[1].substring(0,1);
+                }else{
+                    initials = name.substring(0, 2);
+                }
+                holder.name.setText(name);
+                holder.initials.setText(initials);
+                holder.misterX.setChecked(new ArrayList<>(players.values()).get(i - 1));
             }
         }
     }
@@ -75,12 +82,13 @@ public class ParticipantsAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             return 1;
     }
 
-    public void setPlayers(List<Player> players)
+    public void setPlayers(Map<String, Boolean> players)
     {
         this.players = players;
+
         for (int i = 0; i < players.size(); i++) {
-            if(players.get(i).isMisterX())
-                lastSelectedPos = i;
+            if(new ArrayList<>(players.values()).get(i))
+                lastSelectedName = new ArrayList<>(players.keySet()).get(i);
         }
     }
 
@@ -98,13 +106,13 @@ public class ParticipantsAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             misterX = itemView.findViewById(R.id.detailed_activity_recyclerview_item_radiobutton);
 
             misterX.setOnClickListener((view -> {
-                lastSelectedPos = getAdapterPosition() - 1;
+                lastSelectedName = new ArrayList<>(players.keySet()).get(getAdapterPosition() - 1);
                 for (int i = 0; i < players.size(); i++) {
-                    Player player = players.get(i);
-                    if(i == lastSelectedPos)
-                        player.setMisterX(true);
-                    else
-                        player.setMisterX(false);
+                    if (new ArrayList<>(players.keySet()).get(i).equals(lastSelectedName))
+                        players.put(new ArrayList<>(players.keySet()).get(i), true);
+                     else {
+                        players.put(new ArrayList<>(players.keySet()).get(i), false);
+                    }
                 }
                 //TODO send via firebase
                 notifyDataSetChanged();

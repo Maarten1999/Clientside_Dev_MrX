@@ -29,7 +29,7 @@ public class JsonDecoder
                     leg.getJSONObject("start_location").getDouble("lng"));
 
             RouteModel routeModel = new RouteModel(distanceM, durationSec, endAddress, endLocation, startLocation, startAddress);
-            List<RouteStep> routeSteps = new ArrayList<>();
+            ArrayList<RouteStep> routeSteps = new ArrayList<>();
 
             JSONArray steps = leg.getJSONArray("steps");
             for (int i = 0; i < steps.length(); i++) {

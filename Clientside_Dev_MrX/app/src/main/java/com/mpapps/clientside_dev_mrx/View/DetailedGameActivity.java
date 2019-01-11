@@ -25,6 +25,7 @@ public class DetailedGameActivity extends AppCompatActivity
     private RecyclerView participantRecyclerview;
     private ParticipantsAdapter adapter;
     private TextView modeTitle, modeDescription,gameCode;
+    private boolean textViewsFilled = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -48,9 +49,40 @@ public class DetailedGameActivity extends AppCompatActivity
             startActivity(intent);
         });
 
+        modeTitle = findViewById(R.id.detailed_game_activity_mode);
+        modeDescription = findViewById(R.id.detailed_game_activity_mode_description);
+        gameCode = findViewById(R.id.detailed_game_activity_textview_gamecode);
 
+        viewModel.getGameCode().observe(this, s -> {
+            assert s != null;
+            gameCode.setText(s);
+        });
+
+        viewModel.getGameModel().observe(this, gameModel -> {
+            assert gameModel != null;
+            adapter.setPlayers(gameModel.getPlayers());
+            adapter.notifyDataSetChanged();
+            if (!textViewsFilled)
+                fillTextViews();
+        });
+
+        testDataPlayers();
+    }
+
+    private void testDataPlayers(){
+        List<Player> players = new ArrayList<>();
+        players.add(new Player("MP", "MAARTEN P", false));
+        players.add(new Player("SB", "Sven B", false));
+        players.add(new Player("BP", "Bart P", true));
+        CurrentGameInstance.getInstance().setPlayers(players);
+
+    }
+
+    private void fillTextViews(){
+        if(viewModel.getGameModel().getValue() == null)
+            return;
         String title = "", info = "";
-        switch (CurrentGameInstance.getInstance().getGameModel().getMode()){
+        switch (viewModel.getGameModel().getValue().getMode()){
             case Easy:
                 title = getResources().getString(R.string.gamemode_easy_title);
                 info = getResources().getString(R.string.gamemode_easy_description);
@@ -68,32 +100,9 @@ public class DetailedGameActivity extends AppCompatActivity
                 info = getResources().getString(R.string.gamemode_misterx_description);
                 break;
         }
-        modeTitle = findViewById(R.id.detailed_game_activity_mode);
+
         modeTitle.setText(title);
-        modeDescription = findViewById(R.id.detailed_game_activity_mode_description);
         modeDescription.setText(info);
-        gameCode = findViewById(R.id.detailed_game_activity_textview_gamecode);
-
-        viewModel.getGameCode().observe(this, s -> {
-            assert s != null;
-            gameCode.setText(s);
-        });
-
-        viewModel.getPlayers().observe(this, players -> {
-            assert players != null;
-            adapter.setPlayers(players);
-            adapter.notifyDataSetChanged();
-        });
-
-        testDataPlayers();
-    }
-
-    private void testDataPlayers(){
-        List<Player> players = new ArrayList<>();
-        players.add(new Player("MP", "MAARTEN P", false));
-        players.add(new Player("SB", "Sven B", false));
-        players.add(new Player("BP", "Bart P", true));
-        CurrentGameInstance.getInstance().setPlayers(players);
-
+        textViewsFilled = true;
     }
 }

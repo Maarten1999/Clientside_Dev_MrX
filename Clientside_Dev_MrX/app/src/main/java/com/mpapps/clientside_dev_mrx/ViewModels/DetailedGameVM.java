@@ -5,10 +5,8 @@ import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.MutableLiveData;
 import android.support.annotation.NonNull;
 
-import com.mpapps.clientside_dev_mrx.Models.Player;
+import com.mpapps.clientside_dev_mrx.Models.GameModel;
 import com.mpapps.clientside_dev_mrx.Services.CurrentGameInstance;
-
-import java.util.List;
 
 public class DetailedGameVM extends AndroidViewModel
 {
@@ -17,9 +15,9 @@ public class DetailedGameVM extends AndroidViewModel
         super(application);
     }
 
-    public MutableLiveData<List<Player>> getPlayers()
+    public MutableLiveData<GameModel> getGameModel()
     {
-        return CurrentGameInstance.getInstance().getPlayers();
+        return CurrentGameInstance.getInstance().getGameModel();
     }
 
     public MutableLiveData<String> getGameCode(){
