@@ -4,4 +4,11 @@
     <color name="colorPrimaryDark">#020631</color>
     <color name="colorAccent">#f2d33c</color>
     <color name="editTextHint">#88ffffff</color>
+    <color name="colorPrimaryLight">#0095E4</color>
+    <color name="colorDarkButtonDark">#304b81</color>
+    <color name="colorDarkButtonLight">#3A5897</color>
+    <color name="grey">#808080</color>
+    <color name="dark_grey">#101010</color>
+    <color name="lime_green">#8832cd32</color>
+    <color name="red">#88ff0000</color>
 </resources>

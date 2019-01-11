@@ -57,23 +57,35 @@
 
     <Button
         android:id="@+id/start_activity_btn_new_game"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="24dp"
+        android:layout_marginEnd="32dp"
+        android:background="@drawable/button_gradient_dark"
         android:text="Create Game"
-        app:layout_constraintEnd_toStartOf="@+id/start_activity_background"
+        android:textColor="@android:color/white"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/start_activity_background"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/start_activity_title" />
 
     <Button
         android:id="@+id/start_activity_btn_join_game"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="24dp"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/button_gradient_light"
         android:text="Join Game"
-        app:layout_constraintEnd_toStartOf="@+id/start_activity_background"
+        android:textColor="@android:color/white"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="@+id/start_activity_background"
+        app:layout_constraintEnd_toEndOf="@+id/start_activity_btn_new_game"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/start_activity_background"
+        app:layout_constraintStart_toStartOf="@+id/start_activity_btn_new_game"
         app:layout_constraintTop_toBottomOf="@+id/start_activity_btn_new_game" />
 </android.support.constraint.ConstraintLayout>

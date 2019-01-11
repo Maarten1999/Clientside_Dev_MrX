@@ -1,88 +1,97 @@
 package com.mpapps.clientside_dev_mrx.View;
 
+import android.app.Activity;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
+import android.support.v7.widget.DividerItemDecoration;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.widget.Button;
 
-import com.firebase.ui.auth.AuthUI;
-import com.firebase.ui.auth.IdpResponse;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.messaging.FirebaseMessaging;
-import com.mpapps.clientside_dev_mrx.FirebaseMessagingService;
+import com.mpapps.clientside_dev_mrx.Models.GameMode;
+import com.mpapps.clientside_dev_mrx.Models.GameModel;
 import com.mpapps.clientside_dev_mrx.R;
 import com.mpapps.clientside_dev_mrx.View.Adapters.GameListAdapter;
 import com.mpapps.clientside_dev_mrx.ViewModels.StartActivityVM;
-import com.mpapps.clientside_dev_mrx.Volley.Requests;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Map;
 
 public class StartActivity extends AppCompatActivity {
     private final String TAG = "StartActivityTest";
-    private static final int RC_SIGN_IN = 123;
+    private static final int RC_CREATE_GAME = 5678;
     private StartActivityVM viewModel;
     private GameListAdapter adapter;
+    private RecyclerView gamesRecyclerview;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start);
         viewModel = ViewModelProviders.of(this).get(StartActivityVM.class);
+        
+        //Room insert testdata
+//        Map<String, Boolean> temp = new HashMap<>();
+//        temp.put("Maarten P", false);
+//        temp.put("Hello", true);
+//        temp.put("S B", false);
+//        viewModel.insertGameModel(new GameModel("Test", GameMode.Hard, temp, Calendar.getInstance().getTime(), false));
+//        viewModel.insertGameModel(new GameModel("Test2", GameMode.Easy, temp, Calendar.getInstance().getTime(), true));
 
-        viewModel.getGameModels().observe(this, gameModels -> {
+        viewModel.getHistoryGames().observe(this, gameModels -> {
             assert gameModels != null;
-            Log.d(TAG, gameModels.toString());
+            adapter.setHistoryGames(gameModels);
+            adapter.notifyDataSetChanged();
+
+            //viewModel.addCurrentGame(new GameModel("CurrentGame", GameMode.Hard, temp, Calendar.getInstance().getTime(), false));
         });
 
+        viewModel.getCurrentGames().observe(this, gameModels -> {
+            assert gameModels != null;
+            adapter.setCurrentGames(gameModels);
+            adapter.notifyDataSetChanged();
+        });
 
+        gamesRecyclerview = findViewById(R.id.start_activity_recyclerview);
 
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        gamesRecyclerview.setLayoutManager(layoutManager);
 
-        FirebaseMessagingService.getToken();
+        DividerItemDecoration itemDecoration = new DividerItemDecoration(this, DividerItemDecoration.VERTICAL);
+        itemDecoration.setDrawable(getResources().getDrawable(R.drawable.gamemodes_recyclerview_divideritemdecoration));
+        gamesRecyclerview.addItemDecoration(itemDecoration);
 
-        ArrayList<String> strings = new ArrayList<>();
-        strings.add("cmTf5n1za40:APA91bEkE0bp4CDAGuFTdZ6YuUyB5IP-zeH61edPA2K1g0g4pnXAwta-Kjjm7VGYih33B9xPgTH5jKbKiDtFImM0rt62HQ5LiX5CcE92aG_KH9P7i3CnQa6MIbZX6Uq7ulIBKKa2XcOm");
+        adapter = new GameListAdapter(this);
+        gamesRecyclerview.setAdapter(adapter);
 
-        Requests.createMessagingGroup("volley_test", strings, getApplicationContext());
+        Button createGame = findViewById(R.id.start_activity_btn_new_game);
+        createGame.setOnClickListener(view -> {
+            Intent intent = new Intent(this, NewGameActivity.class);
+            startActivityForResult(intent, RC_CREATE_GAME);
+        });
 
-        //if(FirebaseAuth.getInstance().getCurrentUser() == null)
-            createSignInIntent();
-    }
-
-    private void createSignInIntent() {
-        List<AuthUI.IdpConfig> providers = Arrays.asList(
-                new AuthUI.IdpConfig.EmailBuilder().build(),
-                new AuthUI.IdpConfig.GoogleBuilder().build(),
-                new AuthUI.IdpConfig.AnonymousBuilder().build());
-
-        startActivityForResult(
-                AuthUI.getInstance()
-                        .createSignInIntentBuilder()
-                        .setAvailableProviders(providers)
-                        .enableAnonymousUsersAutoUpgrade()
-                        .setTheme(R.style.LoginTheme)
-                        .setLogo(R.drawable.mister_x_title_full)
-                        .build(),
-                RC_SIGN_IN);
+        Button joinGame = findViewById(R.id.start_activity_btn_join_game);
+        joinGame.setOnClickListener(view -> {
+            //TODO join game fragment
+        });
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data)
+    {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == RC_SIGN_IN) {
-            IdpResponse response = IdpResponse.fromResultIntent(data);
-
-            if (resultCode == RESULT_OK) {
-                //Succesvol ingelogd
-                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-                FirebaseMessaging.getInstance().setAutoInitEnabled(true);
-            } else {
-                //Inloggen is mislukt
-                createSignInIntent();
+        if(requestCode == RC_CREATE_GAME){
+            if(resultCode == Activity.RESULT_OK){
+                String name = data.getStringExtra("new_game_name");
+                GameMode mode = GameMode.values()[data.getIntExtra("new_game_mode", 0)];
+                Map<String, Boolean> players = new HashMap<>();
+                players.put("Maarten P", true);
+                viewModel.addCurrentGame(new GameModel(name, mode, players, Calendar.getInstance().getTime(), false));
             }
         }
     }

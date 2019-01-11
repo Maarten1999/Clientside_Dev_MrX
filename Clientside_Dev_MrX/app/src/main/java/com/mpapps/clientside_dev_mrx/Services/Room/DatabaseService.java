@@ -8,7 +8,7 @@ import android.arch.persistence.room.TypeConverters;
 
 import com.mpapps.clientside_dev_mrx.Models.GameModel;
 
-@Database(entities = {GameModel.class}, version = 1)
+@Database(entities = {GameModel.class}, version = 2)
 @TypeConverters({Converters.class})
 public abstract class DatabaseService extends RoomDatabase
 {

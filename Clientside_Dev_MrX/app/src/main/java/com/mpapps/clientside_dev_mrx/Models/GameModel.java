@@ -5,7 +5,6 @@ import android.arch.persistence.room.PrimaryKey;
 import android.support.annotation.NonNull;
 
 import java.util.Date;
-import java.util.Dictionary;
 import java.util.Map;
 
 @Entity
@@ -14,13 +13,15 @@ public class GameModel
     @NonNull
     @PrimaryKey(autoGenerate = true)
     private int id;
+    private String name;
     private GameMode mode;
     private Map<String, Boolean> players;
     private Date date;
     private boolean isWon;
 
-    public GameModel(GameMode mode, Map<String, Boolean> players, Date date, boolean isWon)
+    public GameModel(String name, GameMode mode, Map<String, Boolean> players, Date date, boolean isWon)
     {
+        this.name = name;
         this.mode = mode;
         this.players = players;
         this.date = date;
@@ -76,6 +77,16 @@ public class GameModel
     public void setWon(boolean won)
     {
         isWon = won;
+    }
+
+    public String getName()
+    {
+        return name;
+    }
+
+    public void setName(String name)
+    {
+        this.name = name;
     }
 }
 

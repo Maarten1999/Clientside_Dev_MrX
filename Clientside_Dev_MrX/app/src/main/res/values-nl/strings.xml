@@ -9,4 +9,9 @@
     <string name="gamemode_normal_title">Normale Modus</string>
     <string name="gamemode_hard_title">Moeilijke Modus</string>
     <string name="gamemode_misterx_title">MisterX Modus</string>
+    <string name="games">Huidige Spellen</string>
+    <string name="history">Geschiedenis</string>
+    <string name="hour">uur</string>
+    <string name="hours">uur</string>
+    <string name="no_games">Nog geen spellen beschikbaar</string>
 </resources>

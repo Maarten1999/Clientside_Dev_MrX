@@ -1,6 +1,8 @@
 package com.mpapps.clientside_dev_mrx.View;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DividerItemDecoration;
@@ -68,7 +70,11 @@ public class NewGameActivity extends AppCompatActivity
             }else if(adapter.getLastSelectedPos() == -1){
                 Toast.makeText(this, "Select a game mode", Toast.LENGTH_SHORT).show();
             }else {
-                //TODO start new game
+                Intent returnIntent = new Intent();
+                returnIntent.putExtra("new_game_name", editText.getText().toString());
+                returnIntent.putExtra("new_game_mode", adapter.getLastSelectedPos());
+                setResult(Activity.RESULT_OK, returnIntent);
+                finish();
             }
         });
     }

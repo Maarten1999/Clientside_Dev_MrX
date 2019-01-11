@@ -10,4 +10,9 @@
     <string name="gamemode_normal_title">Normal Mode</string>
     <string name="gamemode_hard_title">Hard Mode</string>
     <string name="gamemode_misterx_title">MisterX Mode</string>
+    <string name="games">Current Games</string>
+    <string name="history">History</string>
+    <string name="hour">hour</string>
+    <string name="hours">hours</string>
+    <string name="no_games">No games available</string>
 </resources>
