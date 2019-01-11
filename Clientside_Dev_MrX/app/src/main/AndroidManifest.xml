@@ -17,17 +17,17 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyAP7iDAT7ADdRjErFm6d1WZz5R4ybO4nd8" />
 
-        <activity android:name=".View.StartActivity" android:screenOrientation="portrait">
+        <activity
+            android:name=".View.StartActivity"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".View.NewGameActivity" >
-
-        </activity>
-        <activity android:name=".View.MapActivity"></activity>
+        <activity android:name=".View.NewGameActivity"></activity>
+        <activity android:name=".View.MapActivity" />
 
         <service android:name=".FirebaseMessagingService">
             <intent-filter>
@@ -42,7 +42,8 @@
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />
 
-        <activity android:name=".View.BootActivity"></activity>
+        <activity android:name=".View.BootActivity" />
+        <activity android:name=".View.DetailedGameActivity"></activity>
     </application>
 
 </manifest>

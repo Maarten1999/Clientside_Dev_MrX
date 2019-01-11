@@ -14,4 +14,7 @@
     <string name="hour">uur</string>
     <string name="hours">uur</string>
     <string name="no_games">Nog geen spellen beschikbaar</string>
+    <string name="gamecode_is">Spelcode is:</string>
+    <string name="start_game">Start Spel</string>
+    <string name="participants">Deelnemers</string>
 </resources>

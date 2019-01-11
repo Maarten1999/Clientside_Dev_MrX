@@ -15,4 +15,7 @@
     <string name="hour">hour</string>
     <string name="hours">hours</string>
     <string name="no_games">No games available</string>
+    <string name="gamecode_is">Gamecode is:</string>
+    <string name="start_game">Start Game</string>
+    <string name="participants">Participants</string>
 </resources>

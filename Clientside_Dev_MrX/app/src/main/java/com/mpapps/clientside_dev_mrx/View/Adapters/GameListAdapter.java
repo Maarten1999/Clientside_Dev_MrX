@@ -14,7 +14,8 @@ import android.widget.TextView;
 import com.mpapps.clientside_dev_mrx.Models.GameMode;
 import com.mpapps.clientside_dev_mrx.Models.GameModel;
 import com.mpapps.clientside_dev_mrx.R;
-import com.mpapps.clientside_dev_mrx.View.MapActivity;
+import com.mpapps.clientside_dev_mrx.Services.CurrentGameInstance;
+import com.mpapps.clientside_dev_mrx.View.DetailedGameActivity;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -224,7 +225,9 @@ public class GameListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             nameList = itemView.findViewById(R.id.recyclerview_item_current_recyclerview);
             nameList.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false));
             itemView.setOnClickListener(view -> {
-                Intent intent = new Intent(context, MapActivity.class);
+                GameModel model = (new ArrayList<>(gameModels.get("current").keySet())).get(getAdapterPosition());
+                CurrentGameInstance.initialize(model, new ArrayList<>());
+                Intent intent = new Intent(context, DetailedGameActivity.class);
                 context.startActivity(intent);
             });
         }

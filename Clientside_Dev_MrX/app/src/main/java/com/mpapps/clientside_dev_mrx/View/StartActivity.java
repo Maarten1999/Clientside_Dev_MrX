@@ -33,12 +33,12 @@ public class StartActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start);
         viewModel = ViewModelProviders.of(this).get(StartActivityVM.class);
-        
+
         //Room insert testdata
-//        Map<String, Boolean> temp = new HashMap<>();
-//        temp.put("Maarten P", false);
-//        temp.put("Hello", true);
-//        temp.put("S B", false);
+        Map<String, Boolean> temp = new HashMap<>();
+        temp.put("Maarten P", false);
+        temp.put("Hello", true);
+        temp.put("S B", false);
 //        viewModel.insertGameModel(new GameModel("Test", GameMode.Hard, temp, Calendar.getInstance().getTime(), false));
 //        viewModel.insertGameModel(new GameModel("Test2", GameMode.Easy, temp, Calendar.getInstance().getTime(), true));
 
@@ -47,7 +47,7 @@ public class StartActivity extends AppCompatActivity {
             adapter.setHistoryGames(gameModels);
             adapter.notifyDataSetChanged();
 
-            //viewModel.addCurrentGame(new GameModel("CurrentGame", GameMode.Hard, temp, Calendar.getInstance().getTime(), false));
+            viewModel.addCurrentGame(new GameModel("CurrentGame", GameMode.Hard, temp, Calendar.getInstance().getTime(), false));
         });
 
         viewModel.getCurrentGames().observe(this, gameModels -> {
