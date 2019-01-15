@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
 public class CurrentGameInstance
 {
@@ -26,8 +25,8 @@ public class CurrentGameInstance
     private MutableLiveData<GameModel> gameModel;
     private MutableLiveData<List<Player>> players;
     private MutableLiveData<String> gameCode;
-
     private MutableLiveData<Map<String, LatLng>> playerLocations;
+    private String misterXCode;
 
     private CurrentGameInstance(GameModel gameModel)
     {
@@ -39,10 +38,12 @@ public class CurrentGameInstance
         this.gameCode.setValue("");
         this.playerLocations = new MutableLiveData<>();
         Map<String, LatLng> playerLocs = new HashMap<>();
-        for (String s : gameModel.getPlayers().keySet()) {
-            playerLocs.put(s, new LatLng(51.866402 + (new Random().nextInt() / 100), 4.661810 + new Random().nextInt() / 100));
+        for (int i = 0; i < gameModel.getPlayers().keySet().size(); i++) {
+            String s = (new ArrayList<>(gameModel.getPlayers().keySet())).get(i);
+            LatLng latLng = new LatLng(i * 20, i * 40);
+            playerLocs.put(s, latLng);
         }
-        this.playerLocations.postValue(new HashMap<>());
+        this.playerLocations.postValue(playerLocs);
     }
 
     public MutableLiveData<GameModel> getGameModel()
@@ -85,5 +86,15 @@ public class CurrentGameInstance
         Map<String, LatLng> tempLocs = playerLocations.getValue();
         tempLocs.put(player, latLng);
         playerLocations.postValue(tempLocs);
+    }
+
+    public String getMisterXCode()
+    {
+        return misterXCode;
+    }
+
+    public void setMisterXCode(String misterXCode)
+    {
+        this.misterXCode = misterXCode;
     }
 }

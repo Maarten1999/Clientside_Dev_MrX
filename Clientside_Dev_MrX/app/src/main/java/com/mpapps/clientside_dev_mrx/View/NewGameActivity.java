@@ -46,7 +46,6 @@ public class NewGameActivity extends AppCompatActivity
         adapter = new GameModesAdapter(this, createGameModes());
         gameModeRecyclerview.setAdapter(adapter);
 
-
         //editText
         EditText editText = findViewById(R.id.new_game_activity_edittext_name);
         editText.setOnEditorActionListener((v, actionId, event) ->

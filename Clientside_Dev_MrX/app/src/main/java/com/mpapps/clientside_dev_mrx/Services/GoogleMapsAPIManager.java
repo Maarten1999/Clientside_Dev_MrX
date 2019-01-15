@@ -102,7 +102,8 @@ public class GoogleMapsAPIManager
                 response ->
                 {
                     RouteModel routeModel = JsonDecoder.parseRoute(response);
-                    userCurrentRoute.postValue(routeModel);
+                    if(routeModel != null)
+                        userCurrentRoute.postValue(routeModel);
                 }, error -> {
                     Log.i("Route", "Failed");
                 });

@@ -9,7 +9,6 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.mpapps.clientside_dev_mrx.R;
 
 public class GeoCoderService
 {
@@ -32,7 +31,7 @@ public class GeoCoderService
      * @param title
      * @param description
      */
-    public Marker placeMarker(@NonNull GoogleMap map, @NonNull LatLng location, @NonNull float markerColor, @Nullable String title, @Nullable String description, boolean isMisterX) {
+    public Marker placeMarker(@NonNull GoogleMap map, @NonNull LatLng location, @NonNull float markerColor, @Nullable String title, @Nullable String description) {
         Marker marker;
         if (title == null && description != null) {
             marker = map.addMarker(new MarkerOptions().position(location));
@@ -55,10 +54,6 @@ public class GeoCoderService
             marker = map.addMarker(new MarkerOptions().position(location).title(title).snippet(description));
             marker.setIcon(BitmapDescriptorFactory.defaultMarker(markerColor));
         }
-        if(isMisterX)
-            marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.circular_name_textview_yellow_2));
-        else
-            marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.circular_name_textview_2));
         return marker;
     }
 }

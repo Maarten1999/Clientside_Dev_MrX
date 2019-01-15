@@ -18,11 +18,13 @@ public class MapNamesAdapter extends RecyclerView.Adapter<MapNamesAdapter.ViewHo
 {
     private Context context;
     private GameModel gameModel;
+    private OnParticipantClickListener listener;
 
-    public MapNamesAdapter(Context context, GameModel gameModel)
+    public MapNamesAdapter(Context context, GameModel gameModel, OnParticipantClickListener listener)
     {
         this.context = context;
         this.gameModel = gameModel;
+        this.listener = listener;
     }
 
     @NonNull
@@ -73,7 +75,15 @@ public class MapNamesAdapter extends RecyclerView.Adapter<MapNamesAdapter.ViewHo
             super(itemView);
             initials = itemView.findViewById(R.id.map_activity_recyclerview_item_initials);
             name = itemView.findViewById(R.id.map_activity_recyclerview_item_name);
+            itemView.setOnClickListener(view -> {
+                String name = (new ArrayList<>(gameModel.getPlayers().keySet())).get(getAdapterPosition());
+                listener.onParticipantClick(name);
+            });
         }
+    }
+
+    public interface OnParticipantClickListener{
+        void onParticipantClick(String name);
     }
 }
 

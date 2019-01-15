@@ -17,4 +17,17 @@
     <string name="gamecode_is">Spelcode is:</string>
     <string name="start_game">Start Spel</string>
     <string name="participants">Deelnemers</string>
+    <string name="toast_no_location_available">"Geen locatie beschikbaar voor "</string>
+    <string name="notification_text_exit_geofence">Je heb het speelveld verlaten, keer terug!</string>
+    <string name="notification_text_enter_geofence">Je bevindt je in het speelveld, veel plezier!</string>
+    <string name="code_for_the_detectives">Code voor de detectives</string>
+    <string name="enter_the_mister_x_code_below">Vul de code van Mister X hier in</string>
+    <string name="driving">Rijden</string>
+    <string name="bicycling">Fietsen</string>
+    <string name="walking">Lopen</string>
+    <string name="create_route">Maak Route</string>
+    <string name="get_fastest_route">Verkrijg de snelste route naar de laatst bekende locatie van Mister X</string>
+    <string name="route_alertdialog_message">Weet je zeker dat je door wilt gaan met deze route?</string>
+    <string name="ok">Oké</string>
+    <string name="temporary_location">Tijdelijke locatie</string>
 </resources>

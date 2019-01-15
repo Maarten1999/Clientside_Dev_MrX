@@ -18,4 +18,17 @@
     <string name="gamecode_is">Gamecode is:</string>
     <string name="start_game">Start Game</string>
     <string name="participants">Participants</string>
+    <string name="toast_no_location_available">"No location available for "</string>
+    <string name="notification_text_exit_geofence">You are outside the game area, return!</string>
+    <string name="notification_text_enter_geofence">You are inside the game area, enjoy the game!</string>
+    <string name="code_for_the_detectives">Code for the detectives</string>
+    <string name="enter_the_mister_x_code_below">Enter the Mister X code below</string>
+    <string name="driving">Driving</string>
+    <string name="bicycling">Bicycling</string>
+    <string name="walking">Walking</string>
+    <string name="create_route">Create Route</string>
+    <string name="get_fastest_route">Get the fastest route to the last known location of Mister X</string>
+    <string name="route_alertdialog_message">Are you sure you want to continue with this route?</string>
+    <string name="ok">Ok</string>
+    <string name="temporary_location">Temporary location</string>
 </resources>

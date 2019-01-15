@@ -38,7 +38,7 @@ public class StartActivity extends AppCompatActivity {
 
         //Room insert testdata
         Map<String, Boolean> temp = new HashMap<>();
-        temp.put("Maarten P", false);
+        temp.put("Maarten Penning", false);
         temp.put("Hello", true);
         temp.put("S B", false);
 //        viewModel.insertGameModel(new GameModel("Test", GameMode.Hard, temp, Calendar.getInstance().getTime(), false));
