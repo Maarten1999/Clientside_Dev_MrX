@@ -37,6 +37,10 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
     private Context context;
     SharedPreferences sharedPref;
 
+
+    public FirebaseMessagingService() {
+    }
+
     public FirebaseMessagingService(Context context) {
         this.context = context;
 

@@ -10,6 +10,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.gson.JsonObject;
 import com.mpapps.clientside_dev_mrx.Models.TravelMode;
 
 import org.json.JSONArray;
@@ -22,6 +23,8 @@ import java.util.Locale;
 import java.util.Map;
 
 public class Requests {
+
+    static String groupKey;
 
     public static void createMessagingGroup(String notificationKey, List<String> registrationIds, Context context) {
         JSONObject jsonBody = new JSONObject();
@@ -45,7 +48,8 @@ public class Requests {
                     public void onResponse(JSONObject response) {
                         Log.d("RESPONSE", response.toString());
                         try {
-                            response.getJSONObject(notificationKey);
+                           groupKey = (String) response.get("notification_key");
+                           Log.d("groupkey", groupKey);
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -56,6 +60,7 @@ public class Requests {
                     public void onErrorResponse(VolleyError error) {
                         Log.d("VOLLEY_FAILURE", error.toString());
                         Log.d("dd", error.networkResponse.statusCode+"");
+                        Log.d("dd",error.getMessage());
 
                     }
                 }
