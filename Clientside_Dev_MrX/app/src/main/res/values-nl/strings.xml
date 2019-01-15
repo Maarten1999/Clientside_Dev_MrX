@@ -30,4 +30,6 @@
     <string name="route_alertdialog_message">Weet je zeker dat je door wilt gaan met deze route?</string>
     <string name="ok">Oké</string>
     <string name="temporary_location">Tijdelijke locatie</string>
+    <string name="stop_alertdialog_message">Weet je zeker dat je het spel wilt stoppen? Voor de andere spelers zal het spel ook stoppen!</string>
+    <string name="stop_the_game">Stop het Spel</string>
 </resources>

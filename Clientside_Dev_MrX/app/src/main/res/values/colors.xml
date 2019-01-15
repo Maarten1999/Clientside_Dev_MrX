@@ -11,4 +11,5 @@
     <color name="dark_grey">#101010</color>
     <color name="lime_green">#8832cd32</color>
     <color name="red">#88ff0000</color>
+    <color name="red_full_opacity">#ff0000</color>
 </resources>

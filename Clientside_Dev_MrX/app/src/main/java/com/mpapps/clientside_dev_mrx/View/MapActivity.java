@@ -8,7 +8,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
@@ -42,6 +45,7 @@ import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.maps.android.PolyUtil;
 import com.google.maps.android.SphericalUtil;
+import com.mpapps.clientside_dev_mrx.Models.Constants;
 import com.mpapps.clientside_dev_mrx.Models.GameModel;
 import com.mpapps.clientside_dev_mrx.Models.RouteModel;
 import com.mpapps.clientside_dev_mrx.Models.RouteStep;
@@ -72,6 +76,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private GeofencingClient geofencingClient;
     private List<Geofence> geofences;
     private PendingIntent geofencePendingIntent;
+    private android.support.v7.app.AlertDialog backNavigateDialog;
+    private int FinishResultCode;
 
     private List<Marker> mapMarkers;
     private Marker tempMarker;
@@ -96,6 +102,19 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         playerList.setAdapter(adapter);
         setupGoogleMaps(savedInstanceState);
         setupFABBehavior();
+
+        FinishResultCode = Constants.MAPACTIVITY_STOP_GAME_CODE;
+        android.support.v7.app.AlertDialog.Builder alertDialogBuilder = new android.support.v7.app.AlertDialog.Builder(this, R.style.AlertDialogTheme);
+        alertDialogBuilder.setTitle(R.string.stop_the_game)
+                .setMessage(R.string.stop_alertdialog_message)
+                .setIcon(R.drawable.stop_icon)
+                .setPositiveButton(R.string.ok, (dialogInterface, i) ->{
+                    //TODO FIREBASE stop game
+                    setResult(FinishResultCode);
+                    finish();
+                })
+                .setNegativeButton("Cancel", (dialogInterface, i) -> dialogInterface.cancel());
+        backNavigateDialog = alertDialogBuilder.create();
     }
 
     private void setupGoogleMaps(Bundle savedInstanceState)
@@ -110,6 +129,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         FloatingActionButton fab_plus = findViewById(R.id.map_activity_fab_plus);
         FloatingActionButton fab_route = findViewById(R.id.map_activity_fab_route);
         FloatingActionButton fab_misterx = findViewById(R.id.map_activity_fab_misterx);
+        FloatingActionButton fab_stop = findViewById(R.id.map_activity_fab_stop);
 
         FABOpen = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fab_open);
         FABClose = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fab_close);
@@ -121,16 +141,20 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             if (isOpen) {
                 fab_misterx.startAnimation(FABClose);
                 fab_route.startAnimation(FABClose);
+                fab_stop.startAnimation(FABClose);
                 fab_plus.startAnimation(FABCCW);
                 fab_route.setClickable(false);
                 fab_misterx.setClickable(false);
+                fab_stop.setClickable(false);
                 isOpen = false;
             } else {
                 fab_misterx.startAnimation(FABOpen);
                 fab_route.startAnimation(FABOpen);
+                fab_stop.startAnimation(FABOpen);
                 fab_plus.startAnimation(FABCW);
                 fab_route.setClickable(true);
                 fab_misterx.setClickable(true);
+                fab_stop.setClickable(true);
                 isOpen = true;
             }
         });
@@ -160,6 +184,27 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 createRouteFragment.show(fragmentManager, "FRAGMENT_CREATE_ROUTE");
             }
         });
+        fab_stop.setImageBitmap(textAsBitmap("STOP", 36, Color.WHITE));
+        fab_stop.setOnClickListener(view -> {
+            FinishResultCode = Constants.MAPACTIVITY_STOP_GAME_CODE;
+            backNavigateDialog.show();
+        });
+    }
+
+       //method to convert your text to image
+    private Bitmap textAsBitmap(String text, float textSize, int textColor) {
+        Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        paint.setTextSize(textSize);
+        paint.setColor(textColor);
+        paint.setTextAlign(Paint.Align.LEFT);
+        float baseline = -paint.ascent(); // ascent() is negative
+        int width = (int) (paint.measureText(text) + 0.0f); // round
+        int height = (int) (baseline + paint.descent() + 0.0f);
+        Bitmap image = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+
+        Canvas canvas = new Canvas(image);
+        canvas.drawText(text, 0, baseline, paint);
+        return image;
     }
 
     private void setupGeofence(LatLng latLng)
@@ -410,5 +455,12 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             tempMarker.remove();
         tempMarker = GeoCoderService.getInstance()
                 .placeMarker(googleMap, latLng, BitmapDescriptorFactory.HUE_RED, "Marker",getString(R.string.temporary_location));
+    }
+
+    @Override
+    public void onBackPressed()
+    {
+        FinishResultCode = Constants.MAPACTIVITY_STOP_GAME_CODE;
+        backNavigateDialog.show();
     }
 }

@@ -21,6 +21,9 @@ public class CurrentGameInstance
     public static CurrentGameInstance getInstance(){
         return instance;
     }
+    public static void stopGame(){
+        instance = null;
+    }
 
     private MutableLiveData<GameModel> gameModel;
     private MutableLiveData<List<Player>> players;

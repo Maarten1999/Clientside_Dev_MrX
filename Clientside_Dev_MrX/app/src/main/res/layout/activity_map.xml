@@ -62,7 +62,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
-        android:layout_marginBottom="16dp"
+        android:layout_marginBottom="8dp"
         android:elevation="6dp"
         android:src="@drawable/ic_nav_routes"
         android:visibility="invisible"
@@ -82,6 +82,20 @@
         android:visibility="invisible"
         app:backgroundTint="@android:color/white"
         app:layout_constraintBottom_toTopOf="@id/map_activity_fab_plus"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:pressedTranslationZ="12dp" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/map_activity_fab_stop"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        android:elevation="6dp"
+        android:src="@drawable/mister_x"
+        android:visibility="invisible"
+        app:backgroundTint="@android:color/holo_red_dark"
+        app:layout_constraintBottom_toTopOf="@id/map_activity_fab_route"
         app:layout_constraintEnd_toEndOf="parent"
         app:pressedTranslationZ="12dp" />
 

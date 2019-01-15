@@ -46,7 +46,9 @@ public class DetailedGameActivity extends AppCompatActivity
         Button startGame = findViewById(R.id.detailed_game_activity_btn_start);
         startGame.setOnClickListener(view -> {
             Intent intent = new Intent(this, MapActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_FORWARD_RESULT);
             startActivity(intent);
+            finish();
         });
 
         modeTitle = findViewById(R.id.detailed_game_activity_mode);

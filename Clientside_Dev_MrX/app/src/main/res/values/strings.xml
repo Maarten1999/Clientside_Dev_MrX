@@ -31,4 +31,6 @@
     <string name="route_alertdialog_message">Are you sure you want to continue with this route?</string>
     <string name="ok">Ok</string>
     <string name="temporary_location">Temporary location</string>
+    <string name="stop_alertdialog_message">Are you sure you want to quit this game? This game wil end for the other players as well!</string>
+    <string name="stop_the_game">Stop the Game</string>
 </resources>

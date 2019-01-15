@@ -13,9 +13,11 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.widget.Button;
 
+import com.mpapps.clientside_dev_mrx.Models.Constants;
 import com.mpapps.clientside_dev_mrx.Models.GameMode;
 import com.mpapps.clientside_dev_mrx.Models.GameModel;
 import com.mpapps.clientside_dev_mrx.R;
+import com.mpapps.clientside_dev_mrx.Services.CurrentGameInstance;
 import com.mpapps.clientside_dev_mrx.View.Adapters.GameListAdapter;
 import com.mpapps.clientside_dev_mrx.ViewModels.StartActivityVM;
 
@@ -23,9 +25,11 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
-public class StartActivity extends AppCompatActivity {
+import static com.mpapps.clientside_dev_mrx.Models.Constants.RC_CREATE_GAME;
+import static com.mpapps.clientside_dev_mrx.Models.Constants.RC_START_GAME;
+
+public class StartActivity extends AppCompatActivity implements GameListAdapter.onItemClicklistener {
     private final String TAG = "StartActivityTest";
-    private static final int RC_CREATE_GAME = 5678;
     private StartActivityVM viewModel;
     private GameListAdapter adapter;
     private RecyclerView gamesRecyclerview;
@@ -67,7 +71,7 @@ public class StartActivity extends AppCompatActivity {
         itemDecoration.setDrawable(getResources().getDrawable(R.drawable.gamemodes_recyclerview_divideritemdecoration));
         gamesRecyclerview.addItemDecoration(itemDecoration);
 
-        adapter = new GameListAdapter(this);
+        adapter = new GameListAdapter(this, this);
         gamesRecyclerview.setAdapter(adapter);
 
         Button createGame = findViewById(R.id.start_activity_btn_new_game);
@@ -91,7 +95,6 @@ public class StartActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data)
     {
         super.onActivityResult(requestCode, resultCode, data);
-
         if(requestCode == RC_CREATE_GAME){
             if(resultCode == Activity.RESULT_OK){
                 String name = data.getStringExtra("new_game_name");
@@ -100,6 +103,34 @@ public class StartActivity extends AppCompatActivity {
                 players.put("Maarten P", true);
                 viewModel.addCurrentGame(new GameModel(name, mode, players, Calendar.getInstance().getTime(), false));
             }
+        }else if(requestCode == RC_START_GAME){
+            switch (resultCode){
+                case Constants.MAPACTIVITY_GAME_LOST_CODE: {
+                    GameModel gameModel = CurrentGameInstance.getInstance().getGameModel().getValue();
+                    gameModel.setWon(false);
+                    viewModel.insertGameModel(gameModel);
+                    CurrentGameInstance.stopGame();
+                    break;
+                }
+                case Constants.MAPACTIVITY_STOP_GAME_CODE:
+                    CurrentGameInstance.stopGame();
+                    break;
+                case Constants.MAPACTIVITY_GAME_WON_CODE: {
+                    GameModel gameModel = CurrentGameInstance.getInstance().getGameModel().getValue();
+                    gameModel.setWon(true);
+                    viewModel.insertGameModel(gameModel);
+                    CurrentGameInstance.stopGame();
+                    break;
+                }
+            }
         }
+    }
+
+
+    @Override
+    public void onItemClick()
+    {
+        Intent intent = new Intent(this, DetailedGameActivity.class);
+        startActivityForResult(intent, RC_START_GAME);
     }
 }

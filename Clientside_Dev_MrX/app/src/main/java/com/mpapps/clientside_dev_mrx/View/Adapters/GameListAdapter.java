@@ -1,7 +1,6 @@
 package com.mpapps.clientside_dev_mrx.View.Adapters;
 
 import android.content.Context;
-import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -15,7 +14,6 @@ import com.mpapps.clientside_dev_mrx.Models.GameMode;
 import com.mpapps.clientside_dev_mrx.Models.GameModel;
 import com.mpapps.clientside_dev_mrx.R;
 import com.mpapps.clientside_dev_mrx.Services.CurrentGameInstance;
-import com.mpapps.clientside_dev_mrx.View.DetailedGameActivity;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -29,12 +27,14 @@ public class GameListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 {
     private Context context;
     private Map<String, Map<GameModel, Boolean>> gameModels;
+    private onItemClicklistener listener;
 
-    public GameListAdapter(Context ctx)
+    public GameListAdapter(Context ctx, onItemClicklistener listener)
     {
         gameModels = new HashMap<>();
         gameModels.put("current", new HashMap<>());
         gameModels.put("history", new HashMap<>());
+        this.listener = listener;
         this.context = ctx;
     }
 
@@ -227,8 +227,8 @@ public class GameListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             itemView.setOnClickListener(view -> {
                 GameModel model = (new ArrayList<>(gameModels.get("current").keySet())).get(getAdapterPosition());
                 CurrentGameInstance.initialize(model);
-                Intent intent = new Intent(context, DetailedGameActivity.class);
-                context.startActivity(intent);
+                if(listener != null)
+                    listener.onItemClick();
             });
         }
     }
@@ -248,5 +248,9 @@ public class GameListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             nameList.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false));
             imageView = itemView.findViewById(R.id.recyclerview_item_history_imageview);
         }
+    }
+
+    public interface onItemClicklistener{
+        void onItemClick();
     }
 }
