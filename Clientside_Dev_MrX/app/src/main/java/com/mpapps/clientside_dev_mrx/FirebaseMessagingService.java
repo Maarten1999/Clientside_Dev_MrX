@@ -2,6 +2,8 @@ package com.mpapps.clientside_dev_mrx;
 
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.v4.app.NotificationCompat;
@@ -23,6 +25,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.InstanceIdResult;
 import com.google.firebase.messaging.RemoteMessage;
+import com.mpapps.clientside_dev_mrx.View.StartActivity;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -31,13 +34,16 @@ import java.io.UnsupportedEncodingException;
 
 public class FirebaseMessagingService extends com.google.firebase.messaging.FirebaseMessagingService {
 
-    @Override
-    public void onNewToken(String token) {
-        Log.d("MESSAGING_TOKEN", "Refreshed token: " + token);
-        createNotificationChannel();
+    private Context context;
+    SharedPreferences sharedPref;
+
+    public FirebaseMessagingService(Context context) {
+        this.context = context;
+
+        sharedPref = context.getSharedPreferences("com.mpapps.clientside_dev_mrx.sharedPreferences", Context.MODE_PRIVATE);
     }
 
-    public static void getToken() {
+    public void getToken() {
         // Get token
         FirebaseInstanceId.getInstance().getInstanceId()
                 .addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
@@ -49,8 +55,11 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
                         }
 
                         // Get new Instance ID token
-                        String token = task.getResult().getToken();
+                        SharedPreferences.Editor editor = sharedPref.edit();
+                        editor.putString("token", task.getResult().getToken());
+                        editor.commit();
 
+                        String token = task.getResult().getToken();
                         Log.d("TOKEN", token);
                     }
                 });
@@ -103,7 +112,7 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
                     Log.i("LOG_RESPONSE", response);
                 }
             }, new Response.ErrorListener() {
-                   @Override
+                @Override
                 public void onErrorResponse(VolleyError error) {
                     Log.e("LOG_RESPONSE", error.toString());
                 }

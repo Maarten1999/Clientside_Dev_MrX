@@ -1,6 +1,8 @@
 package com.mpapps.clientside_dev_mrx.View;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
@@ -19,7 +21,7 @@ import java.util.List;
 
 public class BootActivity extends AppCompatActivity
 {
-
+    private SharedPreferences sharedPref;
     private static final int RC_SIGN_IN = 123;
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -27,13 +29,12 @@ public class BootActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_boot);
 
+        //get sharedPref
+        sharedPref = this.getSharedPreferences(getString(R.string.sharedPreferences), Context.MODE_PRIVATE);
 
-        FirebaseMessagingService.getToken();
+        FirebaseMessagingService firebaseMessagingService = new FirebaseMessagingService(this);
+        firebaseMessagingService.getToken();
 
-        ArrayList<String> strings = new ArrayList<>();
-        strings.add("cmTf5n1za40:APA91bEkE0bp4CDAGuFTdZ6YuUyB5IP-zeH61edPA2K1g0g4pnXAwta-Kjjm7VGYih33B9xPgTH5jKbKiDtFImM0rt62HQ5LiX5CcE92aG_KH9P7i3CnQa6MIbZX6Uq7ulIBKKa2XcOm");
-
-        Requests.createMessagingGroup("volley_test", strings, getApplicationContext());
 
         if(FirebaseAuth.getInstance().getCurrentUser() == null)
             createSignInIntent();
@@ -46,8 +47,7 @@ public class BootActivity extends AppCompatActivity
     private void createSignInIntent() {
         List<AuthUI.IdpConfig> providers = Arrays.asList(
                 new AuthUI.IdpConfig.EmailBuilder().build(),
-                new AuthUI.IdpConfig.GoogleBuilder().build(),
-                new AuthUI.IdpConfig.AnonymousBuilder().build());
+                new AuthUI.IdpConfig.GoogleBuilder().build());
 
         startActivityForResult(
                 AuthUI.getInstance()
@@ -71,6 +71,10 @@ public class BootActivity extends AppCompatActivity
                 //Succesvol ingelogd
                 FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
                 FirebaseMessaging.getInstance().setAutoInitEnabled(true);
+                String displayname = user.getDisplayName();
+                SharedPreferences.Editor editor = sharedPref.edit();
+                editor.putString("displayname", displayname);
+                editor.commit();
 
                 Intent intent = new Intent(this, StartActivity.class);
                 startActivity(intent);

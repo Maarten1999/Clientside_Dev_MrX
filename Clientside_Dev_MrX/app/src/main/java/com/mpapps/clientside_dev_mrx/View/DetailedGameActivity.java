@@ -1,26 +1,36 @@
 package com.mpapps.clientside_dev_mrx.View;
 
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.google.gson.JsonObject;
 import com.mpapps.clientside_dev_mrx.Models.Player;
 import com.mpapps.clientside_dev_mrx.R;
 import com.mpapps.clientside_dev_mrx.Services.CurrentGameInstance;
 import com.mpapps.clientside_dev_mrx.View.Adapters.ParticipantsAdapter;
 import com.mpapps.clientside_dev_mrx.ViewModels.DetailedGameVM;
+import com.mpapps.clientside_dev_mrx.Volley.Requests;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class DetailedGameActivity extends AppCompatActivity
 {
-
+    private DatabaseReference mDatabase;
     private DetailedGameVM viewModel;
     private RecyclerView participantRecyclerview;
     private ParticipantsAdapter adapter;
@@ -32,6 +42,35 @@ public class DetailedGameActivity extends AppCompatActivity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detailed_game);
+
+        //get sharedpref
+        SharedPreferences sharedPref = this.getSharedPreferences(getString(R.string.sharedPreferences), Context.MODE_PRIVATE);
+        String token = sharedPref.getString("token", "");
+        String username = sharedPref.getString("displayname", "nonameHost");
+
+        //firebase database
+        mDatabase = FirebaseDatabase.getInstance().getReference();
+        String gamecode = CurrentGameInstance.getInstance().getGameCode().getValue();
+        DatabaseReference playerReference = mDatabase.child("games").child(gamecode).child("players");
+        ArrayList<String> strings = new ArrayList<>();
+        playerReference.addListenerForSingleValueEvent(new ValueEventListener() {
+        @Override
+        public void onDataChange(DataSnapshot dataSnapshot) {
+            // This method is called once with the initial value and again
+            // whenever data at this location is updated.
+
+            for (DataSnapshot nameSnapshot : dataSnapshot.getChildren()){
+                strings.add(nameSnapshot.getValue(String.class));
+
+            }
+        }
+
+        @Override
+        public void onCancelled(DatabaseError error) {
+            // Failed to read value
+            Log.w("START_GAME_DB_REFERENCE", "Failed to read value.", error.toException());
+        }
+    });
 
         viewModel = ViewModelProviders.of(this).get(DetailedGameVM.class);
 
@@ -45,6 +84,8 @@ public class DetailedGameActivity extends AppCompatActivity
 
         Button startGame = findViewById(R.id.detailed_game_activity_btn_start);
         startGame.setOnClickListener(view -> {
+            Requests.createMessagingGroup(username, strings, this);
+
             Intent intent = new Intent(this, MapActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_FORWARD_RESULT);
             startActivity(intent);
