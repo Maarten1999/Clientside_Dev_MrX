@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -17,7 +16,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.google.android.gms.auth.api.Auth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -29,10 +27,10 @@ import com.mpapps.clientside_dev_mrx.R;
 import com.mpapps.clientside_dev_mrx.Services.CurrentGameInstance;
 import com.mpapps.clientside_dev_mrx.View.Adapters.GameModesAdapter;
 
-import java.io.Console;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.CountDownLatch;
 
 public class NewGameActivity extends AppCompatActivity {
     private GameModesAdapter adapter;
@@ -40,6 +38,7 @@ public class NewGameActivity extends AppCompatActivity {
     private DatabaseReference mDatabase;
     private ArrayList<String> gameCodeList;
     private String gameCode;
+    private boolean exists;
 
     @Override
 
@@ -54,6 +53,7 @@ public class NewGameActivity extends AppCompatActivity {
 
         //firebase database
         mDatabase = FirebaseDatabase.getInstance().getReference();
+        getGameCodes();
 
         //recyclerview
         gameModeRecyclerview = findViewById(R.id.new_game_activity_recyclerview);
@@ -92,11 +92,12 @@ public class NewGameActivity extends AppCompatActivity {
             } else if (adapter.getLastSelectedPos() == -1) {
                 Toast.makeText(this, "Select a game mode", Toast.LENGTH_SHORT).show();
             } else {
+                String gameCode = generateGamecode();
 
-//                new MyAsyncTask.execute();//
+                mDatabase.child("gamecodes").child(gameCode).setValue(gameCode);
+                mDatabase.child("games").child(gameCode).child("gamecode").child(gameCode);
+                mDatabase.child("games").child(gameCode).child("players").child(username).setValue(token);
 
-                CurrentGameInstance currentGameInstance = CurrentGameInstance.getInstance();
-                currentGameInstance.setGameCode(gameCode + "");
 
                 Intent returnIntent = new Intent();
                 returnIntent.putExtra("new_game_name", editText.getText().toString());
@@ -118,7 +119,7 @@ public class NewGameActivity extends AppCompatActivity {
     }
 
 
-    private String random() {
+    private String randomCode() {
         Random generator = new Random();
         StringBuilder randomStringBuilder = new StringBuilder();
         int randomLength = 4;
@@ -138,32 +139,30 @@ public class NewGameActivity extends AppCompatActivity {
             return ASCIIcharacter();
     }
 
-    private class MyAsyncTask extends AsyncTask<Void, Void, Void> {
-        @Override
-        protected Void doInBackground(Void... params) {
-            DatabaseReference gameCodes = mDatabase.child("gamecodes");
-            gameCodes.addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    for (DataSnapshot ds : dataSnapshot.getChildren()) {
-                        gameCodeList.add(ds.getValue(String.class));
-                    }
-                }
+    private void getGameCodes() {
 
-                @Override
-                public void onCancelled(@NonNull DatabaseError databaseError) {
+        mDatabase.child("gamecodes").addValueEventListener(new ValueEventListener() {
 
-                }
-            });
-            return null;
-        }
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot ds : dataSnapshot.getChildren())
+                    gameCodeList.add(ds.getValue(String.class));
+            }
 
-        @Override
-        protected void onPostExecute(Void result) {
-            for (String s : gameCodeList) {
-//                if (gamecode == s){
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
 
             }
+        });
+    }
+
+    private String generateGamecode() {
+        String gameCode = "1234";
+        for (String s : gameCodeList) {
+            if (gameCode.equals(s)) {
+                gameCode = generateGamecode();
+            }
         }
+        return gameCode;
     }
 }

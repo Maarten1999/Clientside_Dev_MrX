@@ -49,7 +49,7 @@ public class Requests {
 
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        // TODO: Handle error
+                        Log.d("VOLLEY_FAILURE", error.toString())
 
                     }
                 }

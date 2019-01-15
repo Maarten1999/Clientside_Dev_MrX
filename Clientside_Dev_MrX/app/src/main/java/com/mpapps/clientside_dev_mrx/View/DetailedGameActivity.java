@@ -27,19 +27,18 @@ import com.mpapps.clientside_dev_mrx.Volley.Requests;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 
-public class DetailedGameActivity extends AppCompatActivity
-{
+public class DetailedGameActivity extends AppCompatActivity {
     private DatabaseReference mDatabase;
     private DetailedGameVM viewModel;
     private RecyclerView participantRecyclerview;
     private ParticipantsAdapter adapter;
-    private TextView modeTitle, modeDescription,gameCode;
+    private TextView modeTitle, modeDescription, gameCode;
     private boolean textViewsFilled = false;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState)
-    {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detailed_game);
 
@@ -49,28 +48,30 @@ public class DetailedGameActivity extends AppCompatActivity
         String username = sharedPref.getString("displayname", "nonameHost");
 
         //firebase database
+
         mDatabase = FirebaseDatabase.getInstance().getReference();
         String gamecode = CurrentGameInstance.getInstance().getGameCode().getValue();
         DatabaseReference playerReference = mDatabase.child("games").child(gamecode).child("players");
         ArrayList<String> strings = new ArrayList<>();
         playerReference.addListenerForSingleValueEvent(new ValueEventListener() {
-        @Override
-        public void onDataChange(DataSnapshot dataSnapshot) {
-            // This method is called once with the initial value and again
-            // whenever data at this location is updated.
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                // This method is called once with the initial value and again
+                // whenever data at this location is updated.
 
-            for (DataSnapshot nameSnapshot : dataSnapshot.getChildren()){
-                strings.add(nameSnapshot.getValue(String.class));
+                for (DataSnapshot nameSnapshot : dataSnapshot.getChildren()) {
+                    strings.add(nameSnapshot.getValue(String.class));
+
+                }
 
             }
-        }
 
-        @Override
-        public void onCancelled(DatabaseError error) {
-            // Failed to read value
-            Log.w("START_GAME_DB_REFERENCE", "Failed to read value.", error.toException());
-        }
-    });
+            @Override
+            public void onCancelled(DatabaseError error) {
+                // Failed to read value
+                Log.w("START_GAME_DB_REFERENCE", "Failed to read value.", error.toException());
+            }
+        });
 
         viewModel = ViewModelProviders.of(this).get(DetailedGameVM.class);
 
@@ -112,7 +113,7 @@ public class DetailedGameActivity extends AppCompatActivity
         testDataPlayers();
     }
 
-    private void testDataPlayers(){
+    private void testDataPlayers() {
         List<Player> players = new ArrayList<>();
         players.add(new Player("MP", "MAARTEN P", false));
         players.add(new Player("SB", "Sven B", false));
@@ -121,11 +122,11 @@ public class DetailedGameActivity extends AppCompatActivity
 
     }
 
-    private void fillTextViews(){
-        if(viewModel.getGameModel().getValue() == null)
+    private void fillTextViews() {
+        if (viewModel.getGameModel().getValue() == null)
             return;
         String title = "", info = "";
-        switch (viewModel.getGameModel().getValue().getMode()){
+        switch (viewModel.getGameModel().getValue().getMode()) {
             case Easy:
                 title = getResources().getString(R.string.gamemode_easy_title);
                 info = getResources().getString(R.string.gamemode_easy_description);
