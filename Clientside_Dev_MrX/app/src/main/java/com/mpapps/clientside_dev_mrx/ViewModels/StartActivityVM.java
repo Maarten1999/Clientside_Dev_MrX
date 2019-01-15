@@ -25,8 +25,6 @@ public class StartActivityVM extends AndroidViewModel
         historyGames = repository.getAllGameModels();
         currentGames = new MutableLiveData<>();
         currentGames.postValue(new ArrayList<>());
-
-
     }
 
     public void insertGameModel(GameModel model) {

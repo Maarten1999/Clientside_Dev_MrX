@@ -7,12 +7,15 @@ import android.arch.lifecycle.MutableLiveData;
 import android.location.Location;
 import android.support.annotation.NonNull;
 
+import com.google.android.gms.location.Geofence;
 import com.google.android.gms.maps.model.LatLng;
 import com.mpapps.clientside_dev_mrx.Models.RouteModel;
 import com.mpapps.clientside_dev_mrx.Models.TravelMode;
 import com.mpapps.clientside_dev_mrx.Services.CurrentGameInstance;
 import com.mpapps.clientside_dev_mrx.Services.GoogleMapsAPIManager;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 public class MapActivityVM extends AndroidViewModel
@@ -25,12 +28,15 @@ public class MapActivityVM extends AndroidViewModel
     private RouteModel currentRoute;
     private LatLng currentDestination;
     private TravelMode currentTravelMode;
+    private String count_down_date_time;
+    private List<Geofence> geofences;
 
     public MapActivityVM(@NonNull Application application)
     {
         super(application);
         mapsApiManager = GoogleMapsAPIManager.getInstance(application);
         currentGameInstance = CurrentGameInstance.getInstance();
+        geofences = new ArrayList<>();
     }
 
     public LiveData<Location> getCurrentLocation(){
@@ -71,5 +77,25 @@ public class MapActivityVM extends AndroidViewModel
     public void setCurrentRoute(RouteModel currentRoute)
     {
         this.currentRoute = currentRoute;
+    }
+
+    public List<Geofence> getGeofences()
+    {
+        return geofences;
+    }
+
+    public void setGeofences(List<Geofence> geofences)
+    {
+        this.geofences = geofences;
+    }
+
+    public String getCount_down_date_time()
+    {
+        return count_down_date_time;
+    }
+
+    public void setCount_down_date_time(String count_down_date_time)
+    {
+        this.count_down_date_time = count_down_date_time;
     }
 }

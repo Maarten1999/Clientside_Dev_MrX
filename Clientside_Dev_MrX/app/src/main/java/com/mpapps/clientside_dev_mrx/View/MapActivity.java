@@ -4,8 +4,11 @@ import android.Manifest;
 import android.app.AlertDialog;
 import android.app.PendingIntent;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
@@ -15,6 +18,7 @@ import android.graphics.Paint;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
@@ -24,6 +28,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Toast;
@@ -46,6 +51,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.maps.android.PolyUtil;
 import com.google.maps.android.SphericalUtil;
 import com.mpapps.clientside_dev_mrx.Models.Constants;
+import com.mpapps.clientside_dev_mrx.Models.GameMode;
 import com.mpapps.clientside_dev_mrx.Models.GameModel;
 import com.mpapps.clientside_dev_mrx.Models.RouteModel;
 import com.mpapps.clientside_dev_mrx.Models.RouteStep;
@@ -54,10 +60,13 @@ import com.mpapps.clientside_dev_mrx.R;
 import com.mpapps.clientside_dev_mrx.Services.CurrentGameInstance;
 import com.mpapps.clientside_dev_mrx.Services.GeoCoderService;
 import com.mpapps.clientside_dev_mrx.Services.GeofenceTransitionsIntentService;
+import com.mpapps.clientside_dev_mrx.Services.Timer_Service;
 import com.mpapps.clientside_dev_mrx.View.Adapters.MapNamesAdapter;
 import com.mpapps.clientside_dev_mrx.ViewModels.MapActivityVM;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -74,10 +83,12 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private MapNamesAdapter adapter;
     private Polyline routePolyline;
     private GeofencingClient geofencingClient;
-    private List<Geofence> geofences;
     private PendingIntent geofencePendingIntent;
     private android.support.v7.app.AlertDialog backNavigateDialog;
     private int FinishResultCode;
+
+    SharedPreferences mPref;
+    SharedPreferences.Editor mEditor;
 
     private List<Marker> mapMarkers;
     private Marker tempMarker;
@@ -109,14 +120,75 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 .setMessage(R.string.stop_alertdialog_message)
                 .setIcon(R.drawable.stop_icon)
                 .setPositiveButton(R.string.ok, (dialogInterface, i) ->{
-                    //TODO FIREBASE stop game
+                    //TODO FIREBASE stop games
+                    stopService(new Intent(getApplicationContext(), Timer_Service.class));
                     setResult(FinishResultCode);
                     finish();
                 })
                 .setNegativeButton("Cancel", (dialogInterface, i) -> dialogInterface.cancel());
         backNavigateDialog = alertDialogBuilder.create();
+
+        setupCountDownTimer();
     }
 
+    private void setupCountDownTimer(){
+        mPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        mEditor = mPref.edit();
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:mm:ss");
+        boolean startCountDown = false;
+        try {
+            String str_value = mPref.getString("data", "");
+            if (str_value.matches("")) {
+                //todo start countdown
+                startCountDown = true;
+
+            } else {
+
+                if (mPref.getBoolean("countdown_timer_finish", false)) {
+                    //todo start the countdown
+                    startCountDown = true;
+                } else {
+                    //still counting
+                    startCountDown = false;
+                }
+            }
+        } catch (Exception e) { }
+
+        String date_time = simpleDateFormat.format(Calendar.getInstance().getTime());
+        GameMode gameMode = CurrentGameInstance.getInstance().getGameModel().getValue().getMode();
+        int minutes = 0;
+        switch (gameMode) {
+            case Easy:
+                minutes = 15;
+                break;
+            case Normal:
+                minutes = 60;
+                break;
+            case Hard:
+                minutes = 120;
+                break;
+            case MisterX:
+                minutes = 240;
+                break;
+        }
+
+        mEditor.putString("data", date_time).apply();
+        mEditor.putInt("minutes", minutes).apply();
+
+
+        Intent intent_service = new Intent(getApplicationContext(), Timer_Service.class);
+        startService(intent_service);
+    }
+
+    private BroadcastReceiver broadcastReceiver = new BroadcastReceiver()
+    {
+        @Override
+        public void onReceive(Context context, Intent intent)
+        {
+            String str_time = intent.getStringExtra("countdown_timer_time");
+            Log.i("MapActivityTimer", str_time);
+        }
+    };
     private void setupGoogleMaps(Bundle savedInstanceState)
     {
         mMapView = findViewById(R.id.map_activity_mapview);
@@ -209,7 +281,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     private void setupGeofence(LatLng latLng)
     {
-        geofences = new ArrayList<>();
         int radiusKm = 0;
         switch (CurrentGameInstance.getInstance().getGameModel().getValue().getMode()) {
             case Easy:
@@ -225,7 +296,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 radiusKm = 100;
                 break;
         }
-        geofences.add(new Geofence.Builder()
+        viewModel.getGeofences().add(new Geofence.Builder()
                 .setRequestId(CurrentGameInstance.getInstance().getGameModel().getValue().getName())
                 .setCircularRegion(latLng.latitude, latLng.longitude, radiusKm * 1000)
                 .setExpirationDuration(Geofence.NEVER_EXPIRE)
@@ -234,7 +305,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
         GeofencingRequest.Builder builder = new GeofencingRequest.Builder();
         builder.setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_EXIT);
-        builder.addGeofences(geofences);
+        builder.addGeofences(viewModel.getGeofences());
         GeofencingRequest geofencingRequest = builder.build();
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -294,9 +365,11 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 googleMap.moveCamera(CameraUpdateFactory.zoomTo(14));
 
                 LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-                Location location = locationManager.getLastKnownLocation(LocationManager.PASSIVE_PROVIDER);
-                LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
-                googleMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
+                Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                if(location != null){
+                    LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+                    googleMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
+                }
             }
         }
         viewModel.getCurrentLocation().observe(this, location -> {
@@ -415,12 +488,15 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         else
             linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         playerList.setLayoutManager(linearLayoutManager);
+        registerReceiver(broadcastReceiver,
+                new IntentFilter(Constants.str_receiver_countdown_timer));
     }
 
     @Override
     protected void onPause() {
         super.onPause();
         mMapView.onPause();
+        unregisterReceiver(broadcastReceiver);
     }
 
     @Override

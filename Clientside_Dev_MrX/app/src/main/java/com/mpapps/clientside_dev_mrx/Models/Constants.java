@@ -7,4 +7,5 @@ public class Constants
     public static final int MAPACTIVITY_GAME_WON_CODE = 1234;
     public static final int RC_CREATE_GAME = 5678;
     public static final int RC_START_GAME = 6789;
+    public static final String str_receiver_countdown_timer = "com.countdowntimerservice.receiver";
 }
