@@ -60,7 +60,7 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
                         editor.commit();
 
                         String token = task.getResult().getToken();
-                        Log.d("TOKEN", token);
+                        Log.d("MESSAGIN_TOKEN", token);
                     }
                 });
 

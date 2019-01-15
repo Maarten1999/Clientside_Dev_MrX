@@ -58,6 +58,8 @@ public class NewGameActivity extends AppCompatActivity {
         //recyclerview
         gameModeRecyclerview = findViewById(R.id.new_game_activity_recyclerview);
 
+        gameCodeList = new ArrayList<>();
+
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         gameModeRecyclerview.setLayoutManager(layoutManager);
 
@@ -146,7 +148,7 @@ public class NewGameActivity extends AppCompatActivity {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 for (DataSnapshot ds : dataSnapshot.getChildren())
-                    gameCodeList.add(ds.getValue(String.class));
+                    gameCodeList.add(""+ds.getValue());
             }
 
             @Override
@@ -157,7 +159,7 @@ public class NewGameActivity extends AppCompatActivity {
     }
 
     private String generateGamecode() {
-        String gameCode = "1234";
+        String gameCode = randomCode();
         for (String s : gameCodeList) {
             if (gameCode.equals(s)) {
                 gameCode = generateGamecode();

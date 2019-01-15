@@ -44,12 +44,18 @@ public class Requests {
                     @Override
                     public void onResponse(JSONObject response) {
                         Log.d("RESPONSE", response.toString());
+                        try {
+                            response.getJSONObject(notificationKey);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
                     }
                 }, new Response.ErrorListener() {
 
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        Log.d("VOLLEY_FAILURE", error.toString())
+                        Log.d("VOLLEY_FAILURE", error.toString());
+                        Log.d("dd", error.networkResponse.statusCode+"");
 
                     }
                 }
