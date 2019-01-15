@@ -17,7 +17,6 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.google.gson.JsonObject;
 import com.mpapps.clientside_dev_mrx.Models.Player;
 import com.mpapps.clientside_dev_mrx.R;
 import com.mpapps.clientside_dev_mrx.Services.CurrentGameInstance;
@@ -27,7 +26,6 @@ import com.mpapps.clientside_dev_mrx.Volley.Requests;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
 
 public class DetailedGameActivity extends AppCompatActivity {
     private DatabaseReference mDatabase;
@@ -85,17 +83,23 @@ public class DetailedGameActivity extends AppCompatActivity {
 
         Button startGame = findViewById(R.id.detailed_game_activity_btn_start);
         startGame.setOnClickListener(view -> {
-            Requests.createMessagingGroup(username, strings, this);
+            //TODO Uncomment check below for the presentation
+//            if(strings.size() <= 1){
+//                Toast.makeText(getApplicationContext(), "You must have at least 2 players to start the game", Toast.LENGTH_SHORT).show();
+//            }else {
+                Requests.createMessagingGroup(username, strings, this);
 
-            Intent intent = new Intent(this, MapActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_FORWARD_RESULT);
-            startActivity(intent);
-            finish();
+                Intent intent = new Intent(this, MapActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_FORWARD_RESULT);
+                startActivity(intent);
+                finish();
+            //}
         });
 
         modeTitle = findViewById(R.id.detailed_game_activity_mode);
         modeDescription = findViewById(R.id.detailed_game_activity_mode_description);
         gameCode = findViewById(R.id.detailed_game_activity_textview_gamecode);
+        gameCode.setText(gamecode);
 
         viewModel.getGameCode().observe(this, s -> {
             assert s != null;

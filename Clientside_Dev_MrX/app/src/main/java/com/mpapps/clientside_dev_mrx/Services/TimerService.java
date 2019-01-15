@@ -19,7 +19,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 
-public class Timer_Service extends Service
+public class TimerService extends Service
 {
     private Handler handler = new Handler();
     Calendar calendar;

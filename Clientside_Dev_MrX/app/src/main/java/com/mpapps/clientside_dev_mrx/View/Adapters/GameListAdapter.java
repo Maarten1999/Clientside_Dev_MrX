@@ -1,6 +1,7 @@
 package com.mpapps.clientside_dev_mrx.View.Adapters;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -226,7 +227,9 @@ public class GameListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             nameList.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false));
             itemView.setOnClickListener(view -> {
                 GameModel model = (new ArrayList<>(gameModels.get("current").keySet())).get(getAdapterPosition());
-                CurrentGameInstance.initialize(model);
+                SharedPreferences sharedPref = context.getSharedPreferences(context.getString(R.string.sharedPreferences), Context.MODE_PRIVATE);
+                String gameCode = sharedPref.getString("GameCode", "");
+                CurrentGameInstance.initialize(model, gameCode);
                 if(listener != null)
                     listener.onItemClick();
             });

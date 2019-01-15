@@ -18,6 +18,10 @@ public class GeofenceTransitionsIntentService extends IntentService
         super(name);
     }
 
+    public GeofenceTransitionsIntentService(){
+        super("GeofenceTransitionsIntentService");
+    }
+
     @Override
     protected void onHandleIntent(@Nullable Intent intent)
     {

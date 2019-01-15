@@ -10,6 +10,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
@@ -24,13 +25,11 @@ import com.google.firebase.database.ValueEventListener;
 import com.mpapps.clientside_dev_mrx.Models.GameLevel;
 import com.mpapps.clientside_dev_mrx.Models.GameMode;
 import com.mpapps.clientside_dev_mrx.R;
-import com.mpapps.clientside_dev_mrx.Services.CurrentGameInstance;
 import com.mpapps.clientside_dev_mrx.View.Adapters.GameModesAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.concurrent.CountDownLatch;
 
 public class NewGameActivity extends AppCompatActivity {
     private GameModesAdapter adapter;
@@ -100,6 +99,8 @@ public class NewGameActivity extends AppCompatActivity {
                 mDatabase.child("games").child(gameCode).child("gamecode").child(gameCode);
                 mDatabase.child("games").child(gameCode).child("players").child(username).setValue(token);
 
+                SharedPreferences.Editor editor = sharedPref.edit() ;
+                editor.putString("GameCode", gameCode).apply();
 
                 Intent returnIntent = new Intent();
                 returnIntent.putExtra("new_game_name", editText.getText().toString());
@@ -165,6 +166,7 @@ public class NewGameActivity extends AppCompatActivity {
                 gameCode = generateGamecode();
             }
         }
+        Log.i("NewGameActivity", gameCode);
         return gameCode;
     }
 }

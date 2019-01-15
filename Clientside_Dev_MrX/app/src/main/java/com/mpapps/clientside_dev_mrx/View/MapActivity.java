@@ -31,6 +31,7 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.location.Geofence;
@@ -60,7 +61,7 @@ import com.mpapps.clientside_dev_mrx.R;
 import com.mpapps.clientside_dev_mrx.Services.CurrentGameInstance;
 import com.mpapps.clientside_dev_mrx.Services.GeoCoderService;
 import com.mpapps.clientside_dev_mrx.Services.GeofenceTransitionsIntentService;
-import com.mpapps.clientside_dev_mrx.Services.Timer_Service;
+import com.mpapps.clientside_dev_mrx.Services.TimerService;
 import com.mpapps.clientside_dev_mrx.View.Adapters.MapNamesAdapter;
 import com.mpapps.clientside_dev_mrx.ViewModels.MapActivityVM;
 
@@ -75,6 +76,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 {
     private static final int GPS_REQUEST = 50;
     private MapView mMapView;
+    private TextView timerTextView;
     private MapActivityVM viewModel;
     private CameraPosition cameraPosition;
     private GoogleMap googleMap;
@@ -111,6 +113,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         playerList.setLayoutManager(linearLayoutManager);
         adapter = new MapNamesAdapter(this, CurrentGameInstance.getInstance().getGameModel().getValue(), this);
         playerList.setAdapter(adapter);
+
+        timerTextView = findViewById(R.id.map_activity_time_textview);
+
         setupGoogleMaps(savedInstanceState);
         setupFABBehavior();
 
@@ -121,7 +126,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 .setIcon(R.drawable.stop_icon)
                 .setPositiveButton(R.string.ok, (dialogInterface, i) ->{
                     //TODO FIREBASE stop games
-                    stopService(new Intent(getApplicationContext(), Timer_Service.class));
+                    stopService(new Intent(getApplicationContext(), TimerService.class));
                     setResult(FinishResultCode);
                     finish();
                 })
@@ -176,7 +181,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         mEditor.putInt("minutes", minutes).apply();
 
 
-        Intent intent_service = new Intent(getApplicationContext(), Timer_Service.class);
+        Intent intent_service = new Intent(getApplicationContext(), TimerService.class);
         startService(intent_service);
     }
 
@@ -187,6 +192,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         {
             String str_time = intent.getStringExtra("countdown_timer_time");
             Log.i("MapActivityTimer", str_time);
+            timerTextView.setText(str_time);
         }
     };
     private void setupGoogleMaps(Bundle savedInstanceState)
@@ -365,7 +371,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 googleMap.moveCamera(CameraUpdateFactory.zoomTo(14));
 
                 LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-                Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                Location location = locationManager.getLastKnownLocation(LocationManager.PASSIVE_PROVIDER);
                 if(location != null){
                     LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
                     googleMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));

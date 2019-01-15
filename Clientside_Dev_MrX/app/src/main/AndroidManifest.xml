@@ -34,7 +34,7 @@
         </service>
         
         <service android:name=".Services.GeofenceTransitionsIntentService"/>
-        <service android:name=".Services.Timer_Service"/>
+        <service android:name=".Services.TimerService"/>
 
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_channel_id"

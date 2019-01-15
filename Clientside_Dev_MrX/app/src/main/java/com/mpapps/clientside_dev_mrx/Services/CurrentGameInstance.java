@@ -15,8 +15,8 @@ public class CurrentGameInstance
 {
     private static CurrentGameInstance instance;
 
-    public static void initialize(GameModel model){
-        instance = new CurrentGameInstance(model);
+    public static void initialize(GameModel model, String gameCode){
+        instance = new CurrentGameInstance(model, gameCode);
     }
     public static CurrentGameInstance getInstance(){
         return instance;
@@ -31,14 +31,14 @@ public class CurrentGameInstance
     private MutableLiveData<Map<String, LatLng>> playerLocations;
     private String misterXCode;
 
-    private CurrentGameInstance(GameModel gameModel)
+    private CurrentGameInstance(GameModel gameModel, String gameCode)
     {
         this.gameModel = new MutableLiveData<>();
         this.gameModel.postValue(gameModel);
         this.players = new MutableLiveData<>();
         this.players.postValue(new ArrayList<>());
         this.gameCode = new MutableLiveData<>();
-        this.gameCode.setValue("");
+        this.gameCode.setValue(gameCode);
         this.playerLocations = new MutableLiveData<>();
         Map<String, LatLng> playerLocs = new HashMap<>();
         for (int i = 0; i < gameModel.getPlayers().keySet().size(); i++) {
