@@ -101,6 +101,7 @@ public class NewGameActivity extends AppCompatActivity {
                 mDatabase.child("games").child(gameCode).child("gamemode").setValue("" + adapter.getLastSelectedPos());
                 mDatabase.child("games").child(gameCode).child("gamename").setValue(editText.getText().toString());
                 mDatabase.child("games").child(gameCode).child("misterX").setValue(username);
+                mDatabase.child("games").child(gameCode).child("started").setValue(false);
                 SharedPreferences.Editor editor = sharedPref.edit();
                 editor.putString("GameCode", gameCode).apply();
                 editor.putBoolean("countdown_timer_finish", true).apply();
