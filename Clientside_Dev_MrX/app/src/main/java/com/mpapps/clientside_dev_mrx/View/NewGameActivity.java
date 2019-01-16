@@ -98,9 +98,15 @@ public class NewGameActivity extends AppCompatActivity {
                 mDatabase.child("gamecodes").child(gameCode).setValue(gameCode);
                 mDatabase.child("games").child(gameCode).child("gamecode").child(gameCode);
                 mDatabase.child("games").child(gameCode).child("players").child(username).setValue(token);
-
-                SharedPreferences.Editor editor = sharedPref.edit() ;
+                mDatabase.child("games").child(gameCode).child("gamemode").setValue("" + adapter.getLastSelectedPos());
+                mDatabase.child("games").child(gameCode).child("gamename").setValue(editText.getText().toString());
+                mDatabase.child("games").child(gameCode).child("misterX").setValue(username);
+                SharedPreferences.Editor editor = sharedPref.edit();
                 editor.putString("GameCode", gameCode).apply();
+                editor.putBoolean("countdown_timer_finish", true).apply();
+                editor.putString("data", "").apply();
+
+
 
                 Intent returnIntent = new Intent();
                 returnIntent.putExtra("new_game_name", editText.getText().toString());

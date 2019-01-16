@@ -2,8 +2,11 @@ package com.mpapps.clientside_dev_mrx.View;
 
 import android.app.Activity;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -13,6 +16,12 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.widget.Button;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.mpapps.clientside_dev_mrx.Models.Constants;
 import com.mpapps.clientside_dev_mrx.Models.GameMode;
 import com.mpapps.clientside_dev_mrx.Models.GameModel;
@@ -33,12 +42,17 @@ public class StartActivity extends AppCompatActivity implements GameListAdapter.
     private StartActivityVM viewModel;
     private GameListAdapter adapter;
     private RecyclerView gamesRecyclerview;
+    String gamecode;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start);
         viewModel = ViewModelProviders.of(this).get(StartActivityVM.class);
+
+        SharedPreferences sharedPref = this.getSharedPreferences(getString(R.string.sharedPreferences), Context.MODE_PRIVATE);
+        gamecode = sharedPref.getString("GameCode", "");
+
 
         //Room insert testdata
         Map<String, Boolean> temp = new HashMap<>();
@@ -84,7 +98,7 @@ public class StartActivity extends AppCompatActivity implements GameListAdapter.
         joinGame.setOnClickListener(view -> {
             FragmentManager fragmentManager = getSupportFragmentManager();
             Fragment fragment = fragmentManager.findFragmentById(R.id.start_activity_fragment_placeholder);
-            if(fragment == null){
+            if (fragment == null) {
                 JoinGameFragment joinGameFragment = JoinGameFragment.newInstance();
                 joinGameFragment.show(fragmentManager, "FRAGMENT_JOIN_GAME");
             }
@@ -92,19 +106,22 @@ public class StartActivity extends AppCompatActivity implements GameListAdapter.
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data)
-    {
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode == RC_CREATE_GAME){
-            if(resultCode == Activity.RESULT_OK){
+
+        String username = FirebaseAuth.getInstance().getCurrentUser().getDisplayName();
+
+
+        if (requestCode == RC_CREATE_GAME) {
+            if (resultCode == Activity.RESULT_OK) {
                 String name = data.getStringExtra("new_game_name");
                 GameMode mode = GameMode.values()[data.getIntExtra("new_game_mode", 0)];
                 Map<String, Boolean> players = new HashMap<>();
-                players.put("Maarten P", true);
+                players.put(username, true);
                 viewModel.addCurrentGame(new GameModel(name, mode, players, Calendar.getInstance().getTime(), false));
             }
-        }else if(requestCode == RC_START_GAME){
-            switch (resultCode){
+        } else if (requestCode == RC_START_GAME) {
+            switch (resultCode) {
                 case Constants.MAPACTIVITY_GAME_LOST_CODE: {
                     GameModel gameModel = CurrentGameInstance.getInstance().getGameModel().getValue();
                     gameModel.setWon(false);
@@ -128,9 +145,10 @@ public class StartActivity extends AppCompatActivity implements GameListAdapter.
 
 
     @Override
-    public void onItemClick()
-    {
+    public void onItemClick() {
         Intent intent = new Intent(this, DetailedGameActivity.class);
         startActivityForResult(intent, RC_START_GAME);
     }
+
+
 }

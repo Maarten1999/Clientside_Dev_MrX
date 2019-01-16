@@ -70,8 +70,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-public class MapActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnInfoWindowClickListener, GoogleMap.OnMapLongClickListener, MapNamesAdapter.OnParticipantClickListener
-{
+public class MapActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnInfoWindowClickListener, GoogleMap.OnMapLongClickListener, MapNamesAdapter.OnParticipantClickListener {
     private MapView mMapView;
     private TextView timerTextView;
     private MapActivityVM viewModel;
@@ -95,8 +94,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     boolean isOpen = false;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState)
-    {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
 
@@ -120,7 +118,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         alertDialogBuilder.setTitle(R.string.stop_the_game)
                 .setMessage(R.string.stop_alertdialog_message)
                 .setIcon(R.drawable.stop_icon)
-                .setPositiveButton(R.string.ok, (dialogInterface, i) ->{
+                .setPositiveButton(R.string.ok, (dialogInterface, i) -> {
                     //TODO FIREBASE stop games
                     stopService(new Intent(getApplicationContext(), TimerService.class));
                     setResult(FinishResultCode);
@@ -132,7 +130,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         setupCountDownTimer();
     }
 
-    private void setupCountDownTimer(){
+    private void setupCountDownTimer() {
         mPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         mEditor = mPref.edit();
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:mm:ss");
@@ -153,52 +151,57 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                     startCountDown = false;
                 }
             }
-        } catch (Exception e) { }
+        } catch (Exception e) {
+        }
 
         String date_time = simpleDateFormat.format(Calendar.getInstance().getTime());
         GameMode gameMode = CurrentGameInstance.getInstance().getGameModel().getValue().getMode();
         int minutes = 0;
+        int interval = 0;
+
         switch (gameMode) {
             case Easy:
-                minutes = 1;
+                minutes = 15;
+                interval = 2;
                 break;
             case Normal:
                 minutes = 60;
+                interval = 5;
                 break;
             case Hard:
-                minutes = 1;
+                minutes = 120;
+                interval = 10;
                 break;
             case MisterX:
                 minutes = 240;
+                interval = 10;
                 break;
         }
 
-        if(startCountDown) {
+        if (startCountDown) {
             mEditor.putString("data", date_time).apply();
             mEditor.putInt("minutes", minutes).apply();
-
+            mEditor.putInt("count", interval).apply();
 
             Intent intent_service = new Intent(getApplicationContext(), TimerService.class);
             startService(intent_service);
         }
     }
 
-    private BroadcastReceiver broadcastReceiver = new BroadcastReceiver()
-    {
+    private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
-        public void onReceive(Context context, Intent intent)
-        {
+        public void onReceive(Context context, Intent intent) {
             String str_time = intent.getStringExtra("countdown_timer_time");
             boolean isFinished = intent.getBooleanExtra("countdown_timer_finished", false);
             Log.i("MapActivityTimer", str_time);
             timerTextView.setText(str_time);
-            if(isFinished){
+            if (isFinished) {
                 //todo Finish Game with FireBase
                 if (CurrentGameInstance.getInstance().getGameModel().getValue().getPlayers()
-                        .get(FirebaseAuth.getInstance().getCurrentUser().getDisplayName())){
+                        .get(FirebaseAuth.getInstance().getCurrentUser().getDisplayName())) {
                     Toast.makeText(getApplicationContext(), "You have escaped!", Toast.LENGTH_SHORT).show();
                     setResultCode(Constants.MAPACTIVITY_GAME_WON_CODE);
-                }else{
+                } else {
                     Toast.makeText(getApplicationContext(), "Mister X has escaped, you lost!", Toast.LENGTH_SHORT).show();
                     setResultCode(Constants.MAPACTIVITY_GAME_LOST_CODE);
                 }
@@ -208,15 +211,14 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
         }
     };
-    private void setupGoogleMaps(Bundle savedInstanceState)
-    {
+
+    private void setupGoogleMaps(Bundle savedInstanceState) {
         mMapView = findViewById(R.id.map_activity_mapview);
         mMapView.onCreate(savedInstanceState);
         mMapView.getMapAsync(this);
     }
 
-    private void setupFABBehavior()
-    {
+    private void setupFABBehavior() {
         FloatingActionButton fab_plus = findViewById(R.id.map_activity_fab_plus);
         FloatingActionButton fab_route = findViewById(R.id.map_activity_fab_route);
         FloatingActionButton fab_misterx = findViewById(R.id.map_activity_fab_misterx);
@@ -254,13 +256,13 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             //TODO use correct name here
             FragmentManager fragmentManager = getSupportFragmentManager();
             Fragment fragment = fragmentManager.findFragmentById(R.id.map_activity_fragment_placeholder);
-            if(fragment == null){
+            if (fragment == null) {
                 if (CurrentGameInstance.getInstance().getGameModel().getValue().getPlayers()
                         .get(FirebaseAuth.getInstance().getCurrentUser().getDisplayName())) {
                     MisterXCodeFragment misterXCodeFragment = MisterXCodeFragment
                             .newInstance(CurrentGameInstance.getInstance().getMisterXCode());
                     misterXCodeFragment.show(fragmentManager, "FRAGMENT_MISTERX_CODE");
-                }else{
+                } else {
                     MisterXCodeInputFragment inputFragment = new MisterXCodeInputFragment();
                     inputFragment.show(fragmentManager, "FRAGMENT_MISTERX_CODE_INPUT");
                 }
@@ -270,7 +272,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         fab_route.setOnClickListener(view -> {
             FragmentManager fragmentManager = getSupportFragmentManager();
             Fragment fragment = fragmentManager.findFragmentById(R.id.map_activity_fragment_placeholder);
-            if(fragment == null){
+            if (fragment == null) {
                 CreateRouteFragment createRouteFragment = new CreateRouteFragment();
                 createRouteFragment.show(fragmentManager, "FRAGMENT_CREATE_ROUTE");
             }
@@ -282,7 +284,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         });
     }
 
-       //method to convert your text to image
+    //method to convert your text to image
     private Bitmap textAsBitmap(String text, float textSize, int textColor) {
         Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
         paint.setTextSize(textSize);
@@ -298,8 +300,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         return image;
     }
 
-    private void setupGeofence(LatLng latLng)
-    {
+    private void setupGeofence(LatLng latLng) {
         int radiusKm = 0;
         switch (CurrentGameInstance.getInstance().getGameModel().getValue().getMode()) {
             case Easy:
@@ -333,7 +334,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         geofencingClient.addGeofences(geofencingRequest, getGeofencePendingIntent());
     }
 
-    private PendingIntent getGeofencePendingIntent(){
+    private PendingIntent getGeofencePendingIntent() {
         if (geofencePendingIntent == null) {
             Intent intent = new Intent(this, GeofenceTransitionsIntentService.class);
             geofencePendingIntent = PendingIntent.getService(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -342,15 +343,14 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     }
 
     @Override
-    public void onInfoWindowClick(Marker marker)
-    {
+    public void onInfoWindowClick(Marker marker) {
         Location location;
-        if((location = viewModel.getCurrentLocation().getValue()) == null)
+        if ((location = viewModel.getCurrentLocation().getValue()) == null)
             return;
 
         LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
         TravelMode travelMode = TravelMode.driving;
-        if(SphericalUtil.computeDistanceBetween(latLng, marker.getPosition()) < 30)
+        if (SphericalUtil.computeDistanceBetween(latLng, marker.getPosition()) < 30)
             travelMode = TravelMode.walking;
         final TravelMode tempTravelMode = travelMode;
         AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AlertDialogTheme);
@@ -365,55 +365,54 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     }
 
     @Override
-    public void onMapReady(GoogleMap mMap)
-    {
+    public void onMapReady(GoogleMap mMap) {
         this.googleMap = mMap;
         googleMap.setOnInfoWindowClickListener(this);
         googleMap.setOnMapLongClickListener(this);
-        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) !=
                 PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
-            return;
-        }else {
-            googleMap.setMyLocationEnabled(true);
-            if(cameraPosition != null){
-                googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-            }else{
-                googleMap.moveCamera(CameraUpdateFactory.zoomTo(14));
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
 
-                LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-                Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-                if(location != null){
-                    LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
-                    googleMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
-                }
+        }
+        googleMap.setMyLocationEnabled(true);
+        if (cameraPosition != null) {
+            googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+        } else {
+            googleMap.moveCamera(CameraUpdateFactory.zoomTo(14));
+
+            LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+            Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            if (location != null) {
+                LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+                googleMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
             }
         }
+
         viewModel.getCurrentLocation().observe(this, location -> {
-            if(location == null)
+            if (location == null)
                 return;
             LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
-            if(geofencePendingIntent == null)
+            if (geofencePendingIntent == null)
                 setupGeofence(latLng);
 //            googleMap.animateCamera(CameraUpdateFactory
 //                    .newLatLng(latLng));
-            if(routePolyline != null){
+            if (routePolyline != null) {
                 RouteModel routeModel = viewModel.getCurrentRoute();
-                if(routeModel != null){
+                if (routeModel != null) {
                     boolean isOnRoute = false;
                     int closestRouteStep = 0;
                     for (int i = 0; i < routeModel.getRouteSteps().size(); i++) {
                         RouteStep routeStep = routeModel.getRouteSteps().get(i);
-                        if(PolyUtil.isLocationOnPath(latLng, routeStep.getPolyLinePoints(), false, 50)){
+                        if (PolyUtil.isLocationOnPath(latLng, routeStep.getPolyLinePoints(), false, 50)) {
                             isOnRoute = true;
                             closestRouteStep = i;
                         }
                     }
-                    if(closestRouteStep > 0)
+                    if (closestRouteStep > 0)
                         viewModel.getCurrentRoute().getRouteSteps().subList(0, closestRouteStep).clear();
-                    if(!isOnRoute){
+                    if (!isOnRoute) {
                         viewModel.reCalculateRoute();
                     }
                 }
@@ -421,9 +420,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         });
 
         viewModel.getRouteModel().observe(this, routeModel -> {
-            if(routePolyline != null)
+            if (routePolyline != null)
                 routePolyline.remove();
-            if(routeModel == null)
+            if (routeModel == null)
                 return;
 
             PolylineOptions polylineOptions = new PolylineOptions();
@@ -441,7 +440,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
         viewModel.getPlayerLocations().observe(this, stringLatLngMap -> {
             Iterator it = mapMarkers.iterator();
-            while (it.hasNext()){
+            while (it.hasNext()) {
                 Marker marker = (Marker) it.next();
                 marker.remove();
                 it.remove();
@@ -450,22 +449,22 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         });
     }
 
-    private void drawMarkers(Map<String, LatLng> playerLocs){
-        if(playerLocs == null)
+    private void drawMarkers(Map<String, LatLng> playerLocs) {
+        if (playerLocs == null)
             return;
 
         for (int i = 0; i < playerLocs.size(); i++) {
             String name = (new ArrayList<>(playerLocs.keySet())).get(i);
             LatLng latLng = (new ArrayList<>(playerLocs.values())).get(i);
             GameModel model = CurrentGameInstance.getInstance().getGameModel().getValue();
-            if(model != null){
+            if (model != null) {
                 String desciption = "Detective";
                 boolean isMisterX = model.getPlayers().get(name);
                 if (isMisterX) {
                     desciption = "Mister X";
                     mapMarkers.add(GeoCoderService.getInstance()
                             .placeMarker(googleMap, latLng, BitmapDescriptorFactory.HUE_YELLOW, name, desciption));
-                }else
+                } else
                     mapMarkers.add(GeoCoderService.getInstance()
                             .placeMarker(googleMap, latLng, BitmapDescriptorFactory.HUE_BLUE, name, desciption));
             }
@@ -476,7 +475,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     protected void onResume() {
         super.onResume();
         mMapView.onResume();
-        if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT)
+        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT)
             linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
         else
             linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
@@ -495,7 +494,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        if(googleMap != null) {
+        if (googleMap != null) {
             outState.putParcelable("CamPos", googleMap.getCameraPosition());
         }
     }
@@ -507,9 +506,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     }
 
     @Override
-    public void onParticipantClick(String name)
-    {
-        if(viewModel.getPlayerLocations().getValue().get(name) == null){
+    public void onParticipantClick(String name) {
+        if (viewModel.getPlayerLocations().getValue().get(name) == null) {
             Toast.makeText(this, getString(R.string.toast_no_location_available) + name, Toast.LENGTH_SHORT).show();
             return;
         }
@@ -518,17 +516,15 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     }
 
     @Override
-    public void onMapLongClick(LatLng latLng)
-    {
-        if(tempMarker != null)
+    public void onMapLongClick(LatLng latLng) {
+        if (tempMarker != null)
             tempMarker.remove();
         tempMarker = GeoCoderService.getInstance()
-                .placeMarker(googleMap, latLng, BitmapDescriptorFactory.HUE_RED, "Marker",getString(R.string.temporary_location));
+                .placeMarker(googleMap, latLng, BitmapDescriptorFactory.HUE_RED, "Marker", getString(R.string.temporary_location));
     }
 
     @Override
-    public void onBackPressed()
-    {
+    public void onBackPressed() {
         FinishResultCode = Constants.MAPACTIVITY_STOP_GAME_CODE;
         backNavigateDialog.show();
     }

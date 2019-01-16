@@ -1,6 +1,7 @@
 package com.mpapps.clientside_dev_mrx.View.Adapters;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -9,6 +10,8 @@ import android.view.ViewGroup;
 import android.widget.RadioButton;
 import android.widget.TextView;
 
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.mpapps.clientside_dev_mrx.R;
 
 import java.util.ArrayList;
@@ -105,6 +108,11 @@ public class ParticipantsAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             name = itemView.findViewById(R.id.detailed_activity_recyclerview_item_name);
             misterX = itemView.findViewById(R.id.detailed_activity_recyclerview_item_radiobutton);
 
+            SharedPreferences sharedPref = context.getSharedPreferences(context.getString(R.string.sharedPreferences), Context.MODE_PRIVATE);
+            String gamecode = sharedPref.getString("GameCode", "");
+            DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().child("games").child(gamecode);
+
+            lastSelectedName = new ArrayList<>(players.keySet()).get(0);
             misterX.setOnClickListener((view -> {
                 lastSelectedName = new ArrayList<>(players.keySet()).get(getAdapterPosition() - 1);
                 for (int i = 0; i < players.size(); i++) {
@@ -114,7 +122,8 @@ public class ParticipantsAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                         players.put(new ArrayList<>(players.keySet()).get(i), false);
                     }
                 }
-                //TODO send via firebase
+                databaseReference.child("misterX").setValue(lastSelectedName);
+
                 notifyDataSetChanged();
             }));
         }

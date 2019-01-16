@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -17,6 +18,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.mpapps.clientside_dev_mrx.Models.GameModel;
 import com.mpapps.clientside_dev_mrx.Models.Player;
 import com.mpapps.clientside_dev_mrx.R;
 import com.mpapps.clientside_dev_mrx.Services.CurrentGameInstance;
@@ -25,7 +27,9 @@ import com.mpapps.clientside_dev_mrx.ViewModels.DetailedGameVM;
 import com.mpapps.clientside_dev_mrx.Volley.Requests;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class DetailedGameActivity extends AppCompatActivity {
     private DatabaseReference mDatabase;
@@ -34,22 +38,27 @@ public class DetailedGameActivity extends AppCompatActivity {
     private ParticipantsAdapter adapter;
     private TextView modeTitle, modeDescription, gameCode;
     private boolean textViewsFilled = false;
+    String gamecodeString;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detailed_game);
 
+
         //get sharedpref
         SharedPreferences sharedPref = this.getSharedPreferences(getString(R.string.sharedPreferences), Context.MODE_PRIVATE);
         String token = sharedPref.getString("token", "");
         String username = sharedPref.getString("displayname", "nonameHost");
 
+
+
         //firebase database
 
         mDatabase = FirebaseDatabase.getInstance().getReference();
-        String gamecode = CurrentGameInstance.getInstance().getGameCode().getValue();
-        DatabaseReference playerReference = mDatabase.child("games").child(gamecode).child("players");
+        gamecodeString = CurrentGameInstance.getInstance().getGameCode().getValue();
+        DatabaseReference playerReference = mDatabase.child("games").child(gamecodeString).child("players");
+
         ArrayList<String> strings = new ArrayList<>();
         playerReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -87,19 +96,19 @@ public class DetailedGameActivity extends AppCompatActivity {
 //            if(strings.size() <= 1){
 //                Toast.makeText(getApplicationContext(), "You must have at least 2 players to start the game", Toast.LENGTH_SHORT).show();
 //            }else {
-                Requests.createMessagingGroup(username, strings, this);
+            Requests.createMessagingGroup(username, strings, this);
 
-                Intent intent = new Intent(this, MapActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_FORWARD_RESULT);
-                startActivity(intent);
-                finish();
+            Intent intent = new Intent(this, MapActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_FORWARD_RESULT);
+            startActivity(intent);
+            finish();
             //}
         });
 
         modeTitle = findViewById(R.id.detailed_game_activity_mode);
         modeDescription = findViewById(R.id.detailed_game_activity_mode_description);
         gameCode = findViewById(R.id.detailed_game_activity_textview_gamecode);
-        gameCode.setText(gamecode);
+        gameCode.setText(gamecodeString);
 
         viewModel.getGameCode().observe(this, s -> {
             assert s != null;
@@ -115,6 +124,7 @@ public class DetailedGameActivity extends AppCompatActivity {
         });
 
         testDataPlayers();
+        playerListener();
     }
 
     private void testDataPlayers() {
@@ -152,5 +162,30 @@ public class DetailedGameActivity extends AppCompatActivity {
         modeTitle.setText(title);
         modeDescription.setText(info);
         textViewsFilled = true;
+    }
+
+    private void playerListener() {
+
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().child("games").child(gamecodeString);
+        databaseReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                String misterX = dataSnapshot.child("misterX").getValue(String.class);
+                GameModel gameModel = viewModel.getGameModel().getValue();
+                Map<String, Boolean> players = gameModel.getPlayers();
+                for (DataSnapshot ds : dataSnapshot.child("players").getChildren()) {
+                    if (misterX.equals(ds.getKey()))
+                        players.put(ds.getKey(), true);
+                    else
+                        players.put(ds.getKey(), false);
+                }
+                viewModel.getGameModel().postValue(gameModel);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
     }
 }
