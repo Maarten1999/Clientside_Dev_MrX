@@ -11,6 +11,7 @@ import com.mpapps.clientside_dev_mrx.Services.Room.GameModelRepository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.ListIterator;
 
 public class StartActivityVM extends AndroidViewModel
 {
@@ -41,9 +42,22 @@ public class StartActivityVM extends AndroidViewModel
         return currentGames;
     }
 
+    public void deleteCurrentGame(GameModel del){
+        List<GameModel> tempCurrentGames = currentGames.getValue();
+        ListIterator<GameModel> iterator = tempCurrentGames.listIterator();
+        while(iterator.hasNext()) {
+            GameModel temp = iterator.next();
+            if (temp.getMode() == del.getMode() && temp.getDate() == del.getDate() && temp.getName().equals(del.getName())) {
+                iterator.remove();
+            }
+        }
+        currentGames.postValue(tempCurrentGames);
+    }
+
     public void addCurrentGame(GameModel model)
     {
         List<GameModel> models = currentGames.getValue();
+        models.clear();
         models.add(model);
         currentGames.postValue(models);
     }

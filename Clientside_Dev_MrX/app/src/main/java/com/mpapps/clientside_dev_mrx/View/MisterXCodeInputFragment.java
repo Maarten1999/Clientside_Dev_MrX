@@ -1,5 +1,6 @@
 package com.mpapps.clientside_dev_mrx.View;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -12,9 +13,11 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.mpapps.clientside_dev_mrx.R;
+import com.mpapps.clientside_dev_mrx.Services.CurrentGameInstance;
 
 public class MisterXCodeInputFragment extends DialogFragment
 {
+    private OnCatchListener listener;
 
     @Nullable
     @Override
@@ -35,10 +38,29 @@ public class MisterXCodeInputFragment extends DialogFragment
                 Toast.makeText(getContext(), "Enter a code", Toast.LENGTH_SHORT).show();
             }else{
                 String misterxCode = codeInput.getText().toString();
-                //TODO Firebase request for checking misterx code
 
-                //dismiss();
+                if(CurrentGameInstance.getInstance().getMisterXCode().equals(misterxCode)){
+                    listener.onCaught();
+                    dismiss();
+                }else
+                    Toast.makeText(getContext(), "Wrong code", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    @Override
+    public void onAttach(Context context)
+    {
+        super.onAttach(context);
+        if (context instanceof OnCatchListener) {
+            listener = (OnCatchListener) context;
+        } else {
+            throw new RuntimeException(context.toString()
+                    + " must implement OnCodeInputListener");
+        }
+    }
+
+    public interface OnCatchListener{
+        void onCaught();
     }
 }

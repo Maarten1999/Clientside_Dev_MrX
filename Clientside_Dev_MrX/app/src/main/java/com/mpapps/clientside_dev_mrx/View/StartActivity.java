@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -17,11 +16,6 @@ import android.support.v7.widget.RecyclerView;
 import android.widget.Button;
 
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.mpapps.clientside_dev_mrx.Models.Constants;
 import com.mpapps.clientside_dev_mrx.Models.GameMode;
 import com.mpapps.clientside_dev_mrx.Models.GameModel;
@@ -55,10 +49,10 @@ public class StartActivity extends AppCompatActivity implements GameListAdapter.
 
 
         //Room insert testdata
-        Map<String, Boolean> temp = new HashMap<>();
-        temp.put("Maarten Penning", false);
-        temp.put("Hello", true);
-        temp.put("S B", false);
+//        Map<String, Boolean> temp = new HashMap<>();
+//        temp.put("Maarten Penning", false);
+//        temp.put("Hello", true);
+//        temp.put("S B", false);
 //        viewModel.insertGameModel(new GameModel("Test", GameMode.Hard, temp, Calendar.getInstance().getTime(), false));
 //        viewModel.insertGameModel(new GameModel("Test2", GameMode.Easy, temp, Calendar.getInstance().getTime(), true));
 
@@ -66,8 +60,7 @@ public class StartActivity extends AppCompatActivity implements GameListAdapter.
             assert gameModels != null;
             adapter.setHistoryGames(gameModels);
             adapter.notifyDataSetChanged();
-
-            viewModel.addCurrentGame(new GameModel("CurrentGame", GameMode.Hard, temp, Calendar.getInstance().getTime(), false));
+//            viewModel.addCurrentGame(new GameModel("CurrentGame", GameMode.Hard, temp, Calendar.getInstance().getTime(), false));
         });
 
         viewModel.getCurrentGames().observe(this, gameModels -> {
@@ -124,16 +117,21 @@ public class StartActivity extends AppCompatActivity implements GameListAdapter.
             switch (resultCode) {
                 case Constants.MAPACTIVITY_GAME_LOST_CODE: {
                     GameModel gameModel = CurrentGameInstance.getInstance().getGameModel().getValue();
+                    viewModel.deleteCurrentGame(gameModel);
                     gameModel.setWon(false);
                     viewModel.insertGameModel(gameModel);
                     CurrentGameInstance.stopGame();
                     break;
                 }
-                case Constants.MAPACTIVITY_STOP_GAME_CODE:
+                case Constants.MAPACTIVITY_STOP_GAME_CODE: {
+                    GameModel gameModel = CurrentGameInstance.getInstance().getGameModel().getValue();
+                    viewModel.deleteCurrentGame(gameModel);
                     CurrentGameInstance.stopGame();
                     break;
+                }
                 case Constants.MAPACTIVITY_GAME_WON_CODE: {
                     GameModel gameModel = CurrentGameInstance.getInstance().getGameModel().getValue();
+                    viewModel.deleteCurrentGame(gameModel);
                     gameModel.setWon(true);
                     viewModel.insertGameModel(gameModel);
                     CurrentGameInstance.stopGame();

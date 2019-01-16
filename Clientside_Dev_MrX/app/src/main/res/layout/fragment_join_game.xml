@@ -43,7 +43,7 @@
         android:backgroundTint="@color/colorAccent"
         android:ems="10"
         android:hint="_ _ _ _"
-        android:inputType="textPersonName"
+        android:inputType="textCapCharacters"
         android:maxLength="4"
         android:maxLines="1"
         android:textAlignment="center"

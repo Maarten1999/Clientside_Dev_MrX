@@ -229,7 +229,8 @@ public class GameListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 GameModel model = (new ArrayList<>(gameModels.get("current").keySet())).get(getAdapterPosition());
                 SharedPreferences sharedPref = context.getSharedPreferences(context.getString(R.string.sharedPreferences), Context.MODE_PRIVATE);
                 String gameCode = sharedPref.getString("GameCode", "");
-                CurrentGameInstance.initialize(model, gameCode);
+                String misterXCode = sharedPref.getString("MisterXCode", "");
+                CurrentGameInstance.initialize(model, gameCode, misterXCode);
                 if(listener != null)
                     listener.onItemClick();
             });

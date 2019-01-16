@@ -18,7 +18,6 @@ import android.graphics.Paint;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
@@ -48,11 +47,17 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.maps.android.PolyUtil;
 import com.google.maps.android.SphericalUtil;
 import com.mpapps.clientside_dev_mrx.Models.Constants;
 import com.mpapps.clientside_dev_mrx.Models.GameMode;
 import com.mpapps.clientside_dev_mrx.Models.GameModel;
+import com.mpapps.clientside_dev_mrx.Models.GameState;
 import com.mpapps.clientside_dev_mrx.Models.RouteModel;
 import com.mpapps.clientside_dev_mrx.Models.RouteStep;
 import com.mpapps.clientside_dev_mrx.Models.TravelMode;
@@ -71,7 +76,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-public class MapActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnInfoWindowClickListener, GoogleMap.OnMapLongClickListener, MapNamesAdapter.OnParticipantClickListener {
+public class MapActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnInfoWindowClickListener, GoogleMap.OnMapLongClickListener, MapNamesAdapter.OnParticipantClickListener, MisterXCodeInputFragment.OnCatchListener {
     private MapView mMapView;
     private TextView timerTextView;
     private MapActivityVM viewModel;
@@ -96,6 +101,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private Marker tempMarker;
     Animation FABOpen, FABClose, FABCW, FABCCW;
     boolean isOpen = false;
+    private String gameCode;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -117,41 +123,105 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         setupGoogleMaps(savedInstanceState);
         setupFABBehavior();
 
+        mPref = this.getSharedPreferences(getString(R.string.sharedPreferences), Context.MODE_PRIVATE);
+        mEditor = mPref.edit();
+        gameCode = mPref.getString("GameCode", "");
+
+        setupAlertDialog();
+        setupCountDownTimer();
+
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("games/"+gameCode);
+        reference.child("gamestate").addValueEventListener(new ValueEventListener()
+        {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot)
+            {
+                int gameStateInt = Integer.parseInt(dataSnapshot.getValue(String.class));
+                GameState gameState = GameState.values()[gameStateInt];
+                if(gameStateInt > GameState.Started.ordinal()){
+                    int code;
+                    boolean isMisterX;
+                    if (CurrentGameInstance.getInstance().getGameModel().getValue().getPlayers()
+                            .get(FirebaseAuth.getInstance().getCurrentUser().getDisplayName())) {
+                        isMisterX = true;
+                    } else {
+                        isMisterX = false;
+                    }
+                    if(gameState == GameState.Stopped){
+                        code = Constants.MAPACTIVITY_STOP_GAME_CODE;
+                    }else if(gameState == GameState.Won){
+                        if(isMisterX)
+                            code = Constants.MAPACTIVITY_GAME_WON_CODE;
+                        else
+                            code = Constants.MAPACTIVITY_GAME_LOST_CODE;
+                    } else{
+                        if(isMisterX)
+                            code = Constants.MAPACTIVITY_GAME_LOST_CODE;
+                        else
+                            code = Constants.MAPACTIVITY_GAME_WON_CODE;
+                    }
+                    setResult(code);
+                    stopService(intent_service);
+                    finish();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError)
+            {
+
+            }
+        });
+
+        reference.child("location").addValueEventListener(new ValueEventListener()
+        {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot)
+            {
+                if(dataSnapshot.getValue() != null) {
+                    LatLng latLng = new LatLng(dataSnapshot.child("latitude").getValue(Double.class), dataSnapshot.child("longitude").getValue(Double.class));
+                    Map<String, Boolean> players = CurrentGameInstance.getInstance().getGameModel().getValue().getPlayers();
+                    for (String s : players.keySet()) {
+                        if (players.get(s))
+                            viewModel.addPlayerLocation(s, latLng);
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError)
+            {
+
+            }
+        });
+    }
+
+    private void setupAlertDialog(){
         FinishResultCode = Constants.MAPACTIVITY_STOP_GAME_CODE;
         android.support.v7.app.AlertDialog.Builder alertDialogBuilder = new android.support.v7.app.AlertDialog.Builder(this, R.style.AlertDialogTheme);
         alertDialogBuilder.setTitle(R.string.stop_the_game)
                 .setMessage(R.string.stop_alertdialog_message)
                 .setIcon(R.drawable.stop_icon)
                 .setPositiveButton(R.string.ok, (dialogInterface, i) -> {
-                    //TODO FIREBASE stop games
+                    DatabaseReference reference = FirebaseDatabase.getInstance().getReference("games/"+gameCode);
+                    reference.child("gamestate").setValue(String.valueOf(GameState.Stopped.ordinal()));
                     stopService(new Intent(getApplicationContext(), TimerService.class));
                     setResult(FinishResultCode);
                     finish();
                 })
                 .setNegativeButton("Cancel", (dialogInterface, i) -> dialogInterface.cancel());
         backNavigateDialog = alertDialogBuilder.create();
-
-        setupCountDownTimer();
     }
-
     private void setupCountDownTimer() {
 
-        mPref = this.getSharedPreferences(getString(R.string.sharedPreferences), this.MODE_PRIVATE);
-        mEditor = mPref.edit();
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:mm:ss");
         boolean startCountDown = false;
         try {
             String str_value = mPref.getString("data", "");
-
-
             if (str_value.matches("")) {
-                //todo start countdown
                 startCountDown = true;
-
-
             } else {
                 if (mPref.getBoolean("countdown_timer_finish", false)) {
-                    //todo start the countdown
                     startCountDown = true;
                 } else {
                     //still counting
@@ -207,21 +277,31 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             Log.i("MapActivityTimer", str_time);
             timerTextView.setText(str_time);
             if (isFinished) {
-                //todo Finish Game with FireBase
+                int code;
+                GameState gameState;
                 if (CurrentGameInstance.getInstance().getGameModel().getValue().getPlayers()
                         .get(FirebaseAuth.getInstance().getCurrentUser().getDisplayName())) {
                     Toast.makeText(getApplicationContext(), "You have escaped!", Toast.LENGTH_SHORT).show();
-                    setResultCode(Constants.MAPACTIVITY_GAME_WON_CODE);
+                    code = Constants.MAPACTIVITY_GAME_WON_CODE;
+                    gameState = GameState.Won;
                 } else {
                     Toast.makeText(getApplicationContext(), "Mister X has escaped, you lost!", Toast.LENGTH_SHORT).show();
-                    setResultCode(Constants.MAPACTIVITY_GAME_LOST_CODE);
+                    code = Constants.MAPACTIVITY_GAME_LOST_CODE;
+                    gameState = GameState.Won;
                 }
-                stopService(intent_service);
-                finish();
+                navigateBackToStart(code, gameState);
             }
 
         }
     };
+
+    private void navigateBackToStart(int code, GameState gameState){
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("games/"+gameCode);
+        reference.child("gamestate").setValue(String.valueOf(gameState.ordinal()));
+        setResult(code);
+        stopService(intent_service);
+        finish();
+    }
 
     private void setupGoogleMaps(Bundle savedInstanceState) {
         mMapView = findViewById(R.id.map_activity_mapview);
@@ -264,7 +344,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         });
 
         fab_misterx.setOnClickListener(view -> {
-            //TODO use correct name here
             FragmentManager fragmentManager = getSupportFragmentManager();
             Fragment fragment = fragmentManager.findFragmentById(R.id.map_activity_fragment_placeholder);
             if (fragment == null) {
@@ -552,5 +631,11 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                     finish();
                 }
         }
+    }
+
+    @Override
+    public void onCaught()
+    {
+        navigateBackToStart(Constants.MAPACTIVITY_GAME_WON_CODE, GameState.Lost);
     }
 }

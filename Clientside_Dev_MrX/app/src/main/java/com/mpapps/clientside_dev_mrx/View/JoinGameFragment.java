@@ -82,7 +82,8 @@ public class JoinGameFragment extends DialogFragment {
                             }
 
                             GameModel gameModel = new GameModel(gamename,GameMode.values()[gamemode],players,Calendar.getInstance().getTime(),false);
-                            CurrentGameInstance.initialize(gameModel,gameCode);
+                            String misterXCode = dataSnapshot.child(gameCode).child("misterxcode").getValue(String.class);
+                            CurrentGameInstance.initialize(gameModel,gameCode, misterXCode);
                             setCancelable(false);
                             Intent intent = new Intent(getContext(), WaitForStartActivity.class);
                             startActivityForResult(intent, RC_START_GAME);

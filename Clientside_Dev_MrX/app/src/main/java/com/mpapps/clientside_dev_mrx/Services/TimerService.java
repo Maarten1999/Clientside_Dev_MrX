@@ -10,13 +10,11 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.os.Handler;
 import android.os.IBinder;
-import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -41,7 +39,7 @@ public class TimerService extends Service {
     Date date_current, date_diff;
     SharedPreferences mpref;
     SharedPreferences.Editor mEditor;
-    int count = 0;
+    int count = 1;
     String misterX;
     String username;
     String gamecode;

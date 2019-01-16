@@ -95,7 +95,7 @@ public class NewGameActivity extends AppCompatActivity {
                 Toast.makeText(this, "Select a game mode", Toast.LENGTH_SHORT).show();
             } else {
                 String gameCode = generateGamecode();
-
+                String misterXCode = randomCode(8);
                 mDatabase.child("gamecodes").child(gameCode).setValue(gameCode);
                 mDatabase.child("games").child(gameCode).child("gamecode").child(gameCode);
                 mDatabase.child("games").child(gameCode).child("players").child(username).setValue(token);
@@ -103,12 +103,13 @@ public class NewGameActivity extends AppCompatActivity {
                 mDatabase.child("games").child(gameCode).child("gamename").setValue(editText.getText().toString());
                 mDatabase.child("games").child(gameCode).child("misterX").setValue(username);
                 mDatabase.child("games").child(gameCode).child("gamestate").setValue(String.valueOf(GameState.Waiting.ordinal()));
+                mDatabase.child("games").child(gameCode).child("misterxcode").setValue(misterXCode);
+
                 SharedPreferences.Editor editor = sharedPref.edit();
                 editor.putString("GameCode", gameCode).apply();
+                editor.putString("MisterXCode", misterXCode).apply();
                 editor.putBoolean("countdown_timer_finish", true).apply();
                 editor.putString("data", "").apply();
-
-
 
                 Intent returnIntent = new Intent();
                 returnIntent.putExtra("new_game_name", editText.getText().toString());
@@ -130,10 +131,9 @@ public class NewGameActivity extends AppCompatActivity {
     }
 
 
-    private String randomCode() {
+    private String randomCode(int randomLength) {
         Random generator = new Random();
         StringBuilder randomStringBuilder = new StringBuilder();
-        int randomLength = 4;
         char tempChar;
         for (int i = 0; i < randomLength; i++) {
             tempChar = (char) ASCIIcharacter();
@@ -168,7 +168,7 @@ public class NewGameActivity extends AppCompatActivity {
     }
 
     private String generateGamecode() {
-        String gameCode = randomCode();
+        String gameCode = randomCode(4);
         for (String s : gameCodeList) {
             if (gameCode.equals(s)) {
                 gameCode = generateGamecode();
