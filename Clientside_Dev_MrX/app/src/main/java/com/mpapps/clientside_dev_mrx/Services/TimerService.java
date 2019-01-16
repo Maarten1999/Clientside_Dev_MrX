@@ -59,7 +59,7 @@ public class TimerService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        mpref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        mpref = getSharedPreferences(getString(R.string.sharedPreferences),Context.MODE_PRIVATE);
         mEditor = mpref.edit();
         simpleDateFormat = new SimpleDateFormat("HH:mm:ss");
 
@@ -102,6 +102,12 @@ public class TimerService extends Service {
         }
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+    }
+
     public String twoDatesBetweenTime() {
         try {
             date_current = simpleDateFormat.parse(strDate);
@@ -110,12 +116,15 @@ public class TimerService extends Service {
 
         try {
             date_diff = simpleDateFormat.parse(mpref.getString("data", ""));
+
+
         } catch (ParseException e) {
 
         }
 
 
         long diff = date_current.getTime() - date_diff.getTime();
+
         int int_minutes = mpref.getInt("minutes", 0);
         int interval = mpref.getInt("count", 0);
         long interval_mili = TimeUnit.MINUTES.toMillis(interval);

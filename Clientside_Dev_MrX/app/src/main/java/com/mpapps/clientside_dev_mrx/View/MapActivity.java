@@ -87,6 +87,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private int FinishResultCode;
     private static final int GPS_REQUEST = 1;
 
+    Intent intent_service;
+
     SharedPreferences mPref;
     SharedPreferences.Editor mEditor;
 
@@ -133,18 +135,21 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     }
 
     private void setupCountDownTimer() {
+
         mPref = this.getSharedPreferences(getString(R.string.sharedPreferences), this.MODE_PRIVATE);
         mEditor = mPref.edit();
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:mm:ss");
         boolean startCountDown = false;
         try {
             String str_value = mPref.getString("data", "");
+
+
             if (str_value.matches("")) {
                 //todo start countdown
                 startCountDown = true;
 
+
             } else {
-                boolean bool = mPref.getBoolean("countdown_timer_finish", false);
                 if (mPref.getBoolean("countdown_timer_finish", false)) {
                     //todo start the countdown
                     startCountDown = true;
@@ -154,9 +159,11 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 }
             }
         } catch (Exception e) {
+
         }
 
         String date_time = simpleDateFormat.format(Calendar.getInstance().getTime());
+
         GameMode gameMode = CurrentGameInstance.getInstance().getGameModel().getValue().getMode();
         int minutes = 0;
         int interval = 0;
@@ -181,11 +188,13 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         }
 
         if (startCountDown) {
+
             mEditor.putString("data", date_time).apply();
             mEditor.putInt("minutes", minutes).apply();
             mEditor.putInt("count", interval).apply();
 
-            Intent intent_service = new Intent(getApplicationContext(), TimerService.class);
+            intent_service = new Intent(getApplicationContext(), TimerService.class);
+            stopService(intent_service);
             startService(intent_service);
         }
     }
@@ -207,7 +216,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                     Toast.makeText(getApplicationContext(), "Mister X has escaped, you lost!", Toast.LENGTH_SHORT).show();
                     setResultCode(Constants.MAPACTIVITY_GAME_LOST_CODE);
                 }
-                stopService(new Intent(getApplicationContext(), TimerService.class));
+                stopService(intent_service);
                 finish();
             }
 
