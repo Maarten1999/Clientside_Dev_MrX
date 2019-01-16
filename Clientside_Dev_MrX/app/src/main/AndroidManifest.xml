@@ -21,10 +21,8 @@
 
         <activity
             android:name=".View.StartActivity"
-            android:screenOrientation="portrait">
-
-        </activity>
-        <activity android:name=".View.NewGameActivity"></activity>
+            android:screenOrientation="portrait"></activity>
+        <activity android:name=".View.NewGameActivity" />
         <activity android:name=".View.MapActivity" />
 
         <service android:name=".FirebaseMessagingService">
@@ -32,9 +30,8 @@
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
-        
-        <service android:name=".Services.GeofenceTransitionsIntentService"/>
-        <service android:name=".Services.TimerService"/>
+        <service android:name=".Services.GeofenceTransitionsIntentService" />
+        <service android:name=".Services.TimerService" />
 
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_channel_id"
@@ -43,14 +40,15 @@
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />
 
-        <activity android:name=".View.BootActivity" >
+        <activity android:name=".View.BootActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".View.DetailedGameActivity"></activity>
+        <activity android:name=".View.DetailedGameActivity" />
+        <activity android:name=".View.WaitForStartActivity"></activity>
     </application>
-    
+
 </manifest>

@@ -13,9 +13,7 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.gson.JsonObject;
 import com.mpapps.clientside_dev_mrx.Models.TravelMode;
-import com.mpapps.clientside_dev_mrx.R;
 
 import org.json.JSONArray;
 import org.json.JSONException;

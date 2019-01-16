@@ -1,6 +1,7 @@
 package com.mpapps.clientside_dev_mrx.View;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -26,6 +27,8 @@ import com.mpapps.clientside_dev_mrx.Services.CurrentGameInstance;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
+
+import static com.mpapps.clientside_dev_mrx.Models.Constants.RC_START_GAME;
 
 public class JoinGameFragment extends DialogFragment {
 
@@ -81,7 +84,9 @@ public class JoinGameFragment extends DialogFragment {
                             GameModel gameModel = new GameModel(gamename,GameMode.values()[gamemode],players,Calendar.getInstance().getTime(),false);
                             CurrentGameInstance.initialize(gameModel,gameCode);
                             setCancelable(false);
-                            //todo: wait for game start
+                            Intent intent = new Intent(getContext(), WaitForStartActivity.class);
+                            startActivityForResult(intent, RC_START_GAME);
+                            dismiss();
                         } else
                             Toast.makeText(getContext(), "GameCode not found.", Toast.LENGTH_SHORT).show();
                     }

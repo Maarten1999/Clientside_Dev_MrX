@@ -27,7 +27,6 @@ import com.mpapps.clientside_dev_mrx.ViewModels.DetailedGameVM;
 import com.mpapps.clientside_dev_mrx.Volley.Requests;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
