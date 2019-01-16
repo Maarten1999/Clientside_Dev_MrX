@@ -25,7 +25,7 @@ public class WaitForStartActivity extends AppCompatActivity
 
         String gamecode = CurrentGameInstance.getInstance().getGameCode().getValue();
 
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("games").child(gamecode);
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("games/"+gamecode);
         reference.addValueEventListener(new ValueEventListener()
         {
             @Override

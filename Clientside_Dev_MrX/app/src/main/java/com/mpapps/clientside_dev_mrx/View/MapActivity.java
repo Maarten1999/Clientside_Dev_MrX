@@ -19,6 +19,7 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
@@ -84,6 +85,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private PendingIntent geofencePendingIntent;
     private android.support.v7.app.AlertDialog backNavigateDialog;
     private int FinishResultCode;
+    private static final int GPS_REQUEST = 1;
 
     SharedPreferences mPref;
     SharedPreferences.Editor mEditor;
@@ -131,7 +133,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     }
 
     private void setupCountDownTimer() {
-        mPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        mPref = this.getSharedPreferences(getString(R.string.sharedPreferences), this.MODE_PRIVATE);
         mEditor = mPref.edit();
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:mm:ss");
         boolean startCountDown = false;
@@ -142,7 +144,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 startCountDown = true;
 
             } else {
-
+                boolean bool = mPref.getBoolean("countdown_timer_finish", false);
                 if (mPref.getBoolean("countdown_timer_finish", false)) {
                     //todo start the countdown
                     startCountDown = true;
@@ -373,23 +375,25 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) !=
                 PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
+
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
-
-        }
-        googleMap.setMyLocationEnabled(true);
-        if (cameraPosition != null) {
-            googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+            return;
         } else {
-            googleMap.moveCamera(CameraUpdateFactory.zoomTo(14));
 
-            LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-            Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-            if (location != null) {
-                LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
-                googleMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
+            googleMap.setMyLocationEnabled(true);
+            if (cameraPosition != null) {
+                googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+            } else {
+                googleMap.moveCamera(CameraUpdateFactory.zoomTo(14));
+
+                LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+                Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                if (location != null) {
+                    LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+                    googleMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
+                }
             }
         }
-
         viewModel.getCurrentLocation().observe(this, location -> {
             if (location == null)
                 return;
@@ -527,5 +531,17 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     public void onBackPressed() {
         FinishResultCode = Constants.MAPACTIVITY_STOP_GAME_CODE;
         backNavigateDialog.show();
+    }
+
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case GPS_REQUEST:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    this.recreate();
+                } else {
+                    Toast.makeText(getApplicationContext(), "geen locatie", Toast.LENGTH_SHORT).show();
+                    finish();
+                }
+        }
     }
 }

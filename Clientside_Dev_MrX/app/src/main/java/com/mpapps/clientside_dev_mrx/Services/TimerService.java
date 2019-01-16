@@ -128,7 +128,7 @@ public class TimerService extends Service {
         long temp = int_timer - count * interval_mili;
         if (temp > long_hours) {
             count++;
-            if (username == misterX) {
+            if (username.equals(misterX)) {
                 DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().child("games").child(gamecode);
                 LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
                 if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
