@@ -166,13 +166,14 @@ public class DetailedGameActivity extends AppCompatActivity {
 
     private void playerListener() {
 
-        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().child("games").child(gamecodeString);
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("games/"+gamecodeString);
         databaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 String misterX = dataSnapshot.child("misterX").getValue(String.class);
                 GameModel gameModel = viewModel.getGameModel().getValue();
                 Map<String, Boolean> players = gameModel.getPlayers();
+                players.clear();
                 for (DataSnapshot ds : dataSnapshot.child("players").getChildren()) {
                     if (misterX.equals(ds.getKey()))
                         players.put(ds.getKey(), true);

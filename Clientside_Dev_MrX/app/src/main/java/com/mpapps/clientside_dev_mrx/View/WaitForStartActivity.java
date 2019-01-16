@@ -1,6 +1,8 @@
 package com.mpapps.clientside_dev_mrx.View;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -14,23 +16,21 @@ import com.mpapps.clientside_dev_mrx.Models.GameState;
 import com.mpapps.clientside_dev_mrx.R;
 import com.mpapps.clientside_dev_mrx.Services.CurrentGameInstance;
 
-public class WaitForStartActivity extends AppCompatActivity
-{
+public class WaitForStartActivity extends AppCompatActivity {
+
+    String gamecode;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState)
-    {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_wait_for_start);
 
-        String gamecode = CurrentGameInstance.getInstance().getGameCode().getValue();
+        gamecode = CurrentGameInstance.getInstance().getGameCode().getValue();
 
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("games/"+gamecode);
-        reference.addValueEventListener(new ValueEventListener()
-        {
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("games/" + gamecode);
+        reference.addValueEventListener(new ValueEventListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot)
-            {
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 int gameState = Integer.parseInt(dataSnapshot.child("gamestate").getValue(String.class));
 
                 if (gameState >= GameState.Started.ordinal()) {
@@ -43,10 +43,18 @@ public class WaitForStartActivity extends AppCompatActivity
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError databaseError)
-            {
-                
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
             }
         });
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        SharedPreferences sharedpref = getSharedPreferences(getString(R.string.sharedPreferences),Context.MODE_PRIVATE);
+        String username = sharedpref.getString("displayname", "");
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("games/"+gamecode+"/players");
+        databaseReference.child(username).removeValue();
     }
 }
