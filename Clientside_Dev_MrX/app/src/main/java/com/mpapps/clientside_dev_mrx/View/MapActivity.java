@@ -19,12 +19,10 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -74,7 +72,6 @@ import java.util.Map;
 
 public class MapActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnInfoWindowClickListener, GoogleMap.OnMapLongClickListener, MapNamesAdapter.OnParticipantClickListener
 {
-    private static final int GPS_REQUEST = 50;
     private MapView mMapView;
     private TextView timerTextView;
     private MapActivityVM viewModel;
@@ -103,7 +100,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
 
-        askPermission();
         viewModel = ViewModelProviders.of(this).get(MapActivityVM.class);
         geofencingClient = LocationServices.getGeofencingClient(this);
         mapMarkers = new ArrayList<>();
@@ -164,13 +160,13 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         int minutes = 0;
         switch (gameMode) {
             case Easy:
-                minutes = 15;
+                minutes = 1;
                 break;
             case Normal:
                 minutes = 60;
                 break;
             case Hard:
-                minutes = 120;
+                minutes = 1;
                 break;
             case MisterX:
                 minutes = 240;
@@ -201,9 +197,13 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 if (CurrentGameInstance.getInstance().getGameModel().getValue().getPlayers()
                         .get(FirebaseAuth.getInstance().getCurrentUser().getDisplayName())){
                     Toast.makeText(getApplicationContext(), "You have escaped!", Toast.LENGTH_SHORT).show();
+                    setResultCode(Constants.MAPACTIVITY_GAME_WON_CODE);
                 }else{
                     Toast.makeText(getApplicationContext(), "Mister X has escaped, you lost!", Toast.LENGTH_SHORT).show();
+                    setResultCode(Constants.MAPACTIVITY_GAME_LOST_CODE);
                 }
+                stopService(new Intent(getApplicationContext(), TimerService.class));
+                finish();
             }
 
         }
@@ -384,7 +384,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 googleMap.moveCamera(CameraUpdateFactory.zoomTo(14));
 
                 LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-                Location location = locationManager.getLastKnownLocation(LocationManager.PASSIVE_PROVIDER);
+                Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
                 if(location != null){
                     LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
                     googleMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
@@ -469,32 +469,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                     mapMarkers.add(GeoCoderService.getInstance()
                             .placeMarker(googleMap, latLng, BitmapDescriptorFactory.HUE_BLUE, name, desciption));
             }
-        }
-    }
-
-    private void askPermission() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(
-                    this,
-                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                    GPS_REQUEST);
-        }
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        switch (requestCode) {
-            case GPS_REQUEST:
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    Intent i = getBaseContext().getPackageManager()
-                            .getLaunchIntentForPackage(getBaseContext().getPackageName());
-                    assert i != null;
-                    i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    startActivity(i);
-                } else {
-                    Toast.makeText(getApplicationContext(), "geen locatie", Toast.LENGTH_SHORT).show();
-                    finish();
-                }
         }
     }
 

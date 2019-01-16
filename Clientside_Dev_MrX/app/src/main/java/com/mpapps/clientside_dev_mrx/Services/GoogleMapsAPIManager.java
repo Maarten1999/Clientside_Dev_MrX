@@ -32,7 +32,7 @@ public class GoogleMapsAPIManager
     private MutableLiveData<Location> userCurrentLocation;
     private MutableLiveData<RouteModel> userCurrentRoute;
     private LocationManager locationManager;
-    private LocationListener locationListener;
+    private LocationListener locationListenerGPS, locationListenerNetwork;
 
     private GoogleMapsAPIManager(Application application)
     {
@@ -41,7 +41,33 @@ public class GoogleMapsAPIManager
         userCurrentLocation = new MutableLiveData<>();
         userCurrentRoute = new MutableLiveData<>();
         locationManager = (LocationManager) application.getSystemService(Context.LOCATION_SERVICE);
-        locationListener = new LocationListener()
+        locationListenerGPS = new LocationListener()
+        {
+            @Override
+            public void onLocationChanged(Location location)
+            {
+                userCurrentLocation.postValue(location);
+            }
+
+            @Override
+            public void onStatusChanged(String s, int i, Bundle bundle)
+            {
+            }
+
+            @Override
+            public void onProviderEnabled(String s)
+            {
+
+            }
+
+            @Override
+            public void onProviderDisabled(String s)
+            {
+
+            }
+        };
+
+        locationListenerNetwork = new LocationListener()
         {
             @Override
             public void onLocationChanged(Location location)
@@ -75,7 +101,8 @@ public class GoogleMapsAPIManager
         if (ActivityCompat.checkSelfPermission(application, Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED &&
                 ActivityCompat.checkSelfPermission(application, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            locationManager.requestLocationUpdates(LocationManager.PASSIVE_PROVIDER, 2000, 20, locationListener);
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 20, locationListenerGPS);
+            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 5000, 20, locationListenerNetwork);
         }
     }
 
@@ -93,7 +120,10 @@ public class GoogleMapsAPIManager
         if (ActivityCompat.checkSelfPermission(application, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(application, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             while (currentLoc == null) {
-                currentLoc = locationManager.getLastKnownLocation(LocationManager.PASSIVE_PROVIDER);
+                if(userCurrentLocation.getValue() == null)
+                    currentLoc = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                else
+                    currentLoc = userCurrentLocation.getValue();
             }
         }
 
