@@ -19,6 +19,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.mpapps.clientside_dev_mrx.Models.GameModel;
+import com.mpapps.clientside_dev_mrx.Models.GameState;
 import com.mpapps.clientside_dev_mrx.Models.Player;
 import com.mpapps.clientside_dev_mrx.R;
 import com.mpapps.clientside_dev_mrx.Services.CurrentGameInstance;
@@ -96,7 +97,7 @@ public class DetailedGameActivity extends AppCompatActivity {
 //                Toast.makeText(getApplicationContext(), "You must have at least 2 players to start the game", Toast.LENGTH_SHORT).show();
 //            }else {
             Requests.createMessagingGroup(username, strings, this);
-            mDatabase.child("games").child(gamecodeString).child("started").setValue(true);
+            mDatabase.child("games").child(gamecodeString).child("gamestate").setValue(String.valueOf(GameState.Started.ordinal()));
             Intent intent = new Intent(this, MapActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_FORWARD_RESULT);
             startActivity(intent);

@@ -24,6 +24,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.mpapps.clientside_dev_mrx.Models.GameLevel;
 import com.mpapps.clientside_dev_mrx.Models.GameMode;
+import com.mpapps.clientside_dev_mrx.Models.GameState;
 import com.mpapps.clientside_dev_mrx.R;
 import com.mpapps.clientside_dev_mrx.View.Adapters.GameModesAdapter;
 
@@ -101,7 +102,7 @@ public class NewGameActivity extends AppCompatActivity {
                 mDatabase.child("games").child(gameCode).child("gamemode").setValue("" + adapter.getLastSelectedPos());
                 mDatabase.child("games").child(gameCode).child("gamename").setValue(editText.getText().toString());
                 mDatabase.child("games").child(gameCode).child("misterX").setValue(username);
-                mDatabase.child("games").child(gameCode).child("started").setValue(false);
+                mDatabase.child("games").child(gameCode).child("gamestate").setValue(String.valueOf(GameState.Waiting.ordinal()));
                 SharedPreferences.Editor editor = sharedPref.edit();
                 editor.putString("GameCode", gameCode).apply();
                 editor.putBoolean("countdown_timer_finish", true).apply();
