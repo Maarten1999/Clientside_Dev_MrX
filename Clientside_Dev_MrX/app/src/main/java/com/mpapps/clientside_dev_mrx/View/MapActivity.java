@@ -92,6 +92,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private int FinishResultCode;
     private static final int GPS_REQUEST = 1;
 
+    String misterX;
     Intent intent_service;
 
     SharedPreferences mPref;
@@ -125,7 +126,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
         mPref = this.getSharedPreferences(getString(R.string.sharedPreferences), Context.MODE_PRIVATE);
         mEditor = mPref.edit();
-        gameCode = mPref.getString("GameCode", "");
+        gameCode = CurrentGameInstance.getInstance().getGameCode().getValue();
+        getMisterX();
 
         setupAlertDialog();
         setupCountDownTimer();
@@ -344,11 +346,14 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         });
 
         fab_misterx.setOnClickListener(view -> {
+            SharedPreferences sharedPreferences = getSharedPreferences(getString(R.string.sharedPreferences), MODE_PRIVATE);
+            String username = sharedPreferences.getString("displayname", "");
+
+
             FragmentManager fragmentManager = getSupportFragmentManager();
             Fragment fragment = fragmentManager.findFragmentById(R.id.map_activity_fragment_placeholder);
             if (fragment == null) {
-                if (CurrentGameInstance.getInstance().getGameModel().getValue().getPlayers()
-                        .get(FirebaseAuth.getInstance().getCurrentUser().getDisplayName())) {
+                if (username.equals(misterX)) {
                     MisterXCodeFragment misterXCodeFragment = MisterXCodeFragment
                             .newInstance(CurrentGameInstance.getInstance().getMisterXCode());
                     misterXCodeFragment.show(fragmentManager, "FRAGMENT_MISTERX_CODE");
@@ -634,8 +639,22 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     }
 
     @Override
-    public void onCaught()
-    {
+    public void onCaught() {
         navigateBackToStart(Constants.MAPACTIVITY_GAME_WON_CODE, GameState.Lost);
+    }
+
+    private void getMisterX() {
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("games/" + gameCode + "/misterX");
+        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                misterX = dataSnapshot.getValue(String.class);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
     }
 }
