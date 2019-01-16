@@ -93,20 +93,26 @@ public class TimerService extends Service
         long diffMinutes2 = long_hours / (60 * 1000) % 60;
         long diffHours2 = long_hours / (60 * 60 * 1000) % 24;
 
-        if(long_hours > 0){
-            String str_testing = diffHours2 + ":" + diffMinutes2 + ":" + diffSeconds2;
-            fn_update(str_testing);
+        String str_testing = diffHours2 + ":" + diffMinutes2 + ":" + diffSeconds2;
+        if(long_hours >= 0){
+//            if(long_hours == 0){
+//                mEditor.putBoolean("countdown_timer_finish", true).commit();
+//                mTimer.cancel();
+//            }
+            fn_update(str_testing, false);
         }
         else {
             mEditor.putBoolean("countdown_timer_finish", true).commit();
+            fn_update(str_testing, true);
             mTimer.cancel();
         }
         return "";
     }
 
-    private void fn_update(String str_time){
+    private void fn_update(String str_time, boolean isFinished){
 
         intent.putExtra("countdown_timer_time",str_time);
+        intent.putExtra("countdown_timer_finished", isFinished);
         sendBroadcast(intent);
     }
 }

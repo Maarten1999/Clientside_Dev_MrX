@@ -177,12 +177,14 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 break;
         }
 
-        mEditor.putString("data", date_time).apply();
-        mEditor.putInt("minutes", minutes).apply();
+        if(startCountDown) {
+            mEditor.putString("data", date_time).apply();
+            mEditor.putInt("minutes", minutes).apply();
 
 
-        Intent intent_service = new Intent(getApplicationContext(), TimerService.class);
-        startService(intent_service);
+            Intent intent_service = new Intent(getApplicationContext(), TimerService.class);
+            startService(intent_service);
+        }
     }
 
     private BroadcastReceiver broadcastReceiver = new BroadcastReceiver()
@@ -191,8 +193,19 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         public void onReceive(Context context, Intent intent)
         {
             String str_time = intent.getStringExtra("countdown_timer_time");
+            boolean isFinished = intent.getBooleanExtra("countdown_timer_finished", false);
             Log.i("MapActivityTimer", str_time);
             timerTextView.setText(str_time);
+            if(isFinished){
+                //todo Finish Game with FireBase
+                if (CurrentGameInstance.getInstance().getGameModel().getValue().getPlayers()
+                        .get(FirebaseAuth.getInstance().getCurrentUser().getDisplayName())){
+                    Toast.makeText(getApplicationContext(), "You have escaped!", Toast.LENGTH_SHORT).show();
+                }else{
+                    Toast.makeText(getApplicationContext(), "Mister X has escaped, you lost!", Toast.LENGTH_SHORT).show();
+                }
+            }
+
         }
     };
     private void setupGoogleMaps(Bundle savedInstanceState)
