@@ -1,6 +1,7 @@
 package com.mpapps.clientside_dev_mrx.Volley;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.util.Log;
@@ -10,8 +11,11 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.gson.JsonObject;
 import com.mpapps.clientside_dev_mrx.Models.TravelMode;
+import com.mpapps.clientside_dev_mrx.R;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -49,6 +53,14 @@ public class Requests {
                         Log.d("RESPONSE", response.toString());
                         try {
                            groupKey = (String) response.get("notification_key");
+
+                            DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
+
+                            SharedPreferences sharedPref = context.getSharedPreferences("com.mpapps.clientside_dev_mrx.sharedPreferences", Context.MODE_PRIVATE);
+                            String gamecode = sharedPref.getString("GameCode", "");
+
+                            reference.child("games").child(gamecode).child("notificationKey").setValue(groupKey);
+
                            Log.d("groupkey", groupKey);
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -60,7 +72,7 @@ public class Requests {
                     public void onErrorResponse(VolleyError error) {
                         Log.d("VOLLEY_FAILURE", error.toString());
                         Log.d("dd", error.networkResponse.statusCode+"");
-                        Log.d("dd",error.getMessage());
+                        
 
                     }
                 }

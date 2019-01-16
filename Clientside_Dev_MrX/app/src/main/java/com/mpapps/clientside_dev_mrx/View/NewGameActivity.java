@@ -149,7 +149,7 @@ public class NewGameActivity extends AppCompatActivity {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 for (DataSnapshot ds : dataSnapshot.getChildren())
-                    gameCodeList.add(""+ds.getValue());
+                    gameCodeList.add("" + ds.getKey());
             }
 
             @Override
