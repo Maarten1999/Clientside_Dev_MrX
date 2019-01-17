@@ -39,6 +39,8 @@ public class DetailedGameActivity extends AppCompatActivity {
     private TextView modeTitle, modeDescription, gameCode;
     private boolean textViewsFilled = false;
     String gamecodeString;
+    private ValueEventListener valueEventListener;
+    private DatabaseReference databaseReference;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,12 +94,12 @@ public class DetailedGameActivity extends AppCompatActivity {
 
         Button startGame = findViewById(R.id.detailed_game_activity_btn_start);
         startGame.setOnClickListener(view -> {
-            //TODO Uncomment check below for the presentation
 //            if(strings.size() <= 1){
 //                Toast.makeText(getApplicationContext(), "You must have at least 2 players to start the game", Toast.LENGTH_SHORT).show();
 //            }else {
             Requests.createMessagingGroup(username, strings, this);
             mDatabase.child("games").child(gamecodeString).child("gamestate").setValue(String.valueOf(GameState.Started.ordinal()));
+            databaseReference.removeEventListener(valueEventListener);
             Intent intent = new Intent(this, MapActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_FORWARD_RESULT);
             startActivity(intent);
@@ -166,8 +168,8 @@ public class DetailedGameActivity extends AppCompatActivity {
 
     private void playerListener() {
 
-        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("games/"+gamecodeString);
-        databaseReference.addValueEventListener(new ValueEventListener() {
+        databaseReference = FirebaseDatabase.getInstance().getReference("games/"+gamecodeString);
+        valueEventListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 String misterX = dataSnapshot.child("misterX").getValue(String.class);
@@ -187,6 +189,7 @@ public class DetailedGameActivity extends AppCompatActivity {
             public void onCancelled(@NonNull DatabaseError databaseError) {
 
             }
-        });
+        };
+        databaseReference.addValueEventListener(valueEventListener);
     }
 }

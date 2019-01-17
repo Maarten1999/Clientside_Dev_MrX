@@ -30,6 +30,7 @@ public class MapActivityVM extends AndroidViewModel
     private TravelMode currentTravelMode;
     private String count_down_date_time;
     private List<Geofence> geofences;
+    private LatLng tempMarkerPos;
 
     public MapActivityVM(@NonNull Application application)
     {
@@ -58,6 +59,8 @@ public class MapActivityVM extends AndroidViewModel
     }
 
     public void calculateRoute(LatLng dest, TravelMode travelMode){
+        currentDestination = dest;
+        currentTravelMode = travelMode;
         mapsApiManager.calculateRoute(dest, travelMode);
     }
 
@@ -97,5 +100,25 @@ public class MapActivityVM extends AndroidViewModel
     public void setCount_down_date_time(String count_down_date_time)
     {
         this.count_down_date_time = count_down_date_time;
+    }
+
+    public void setCurrentTravelMode(TravelMode currentTravelMode)
+    {
+        this.currentTravelMode = currentTravelMode;
+    }
+
+    public void setCurrentDestination(LatLng currentDestination)
+    {
+        this.currentDestination = currentDestination;
+    }
+
+    public LatLng getTempMarkerPos()
+    {
+        return tempMarkerPos;
+    }
+
+    public void setTempMarkerPos(LatLng tempMarkerPos)
+    {
+        this.tempMarkerPos = tempMarkerPos;
     }
 }

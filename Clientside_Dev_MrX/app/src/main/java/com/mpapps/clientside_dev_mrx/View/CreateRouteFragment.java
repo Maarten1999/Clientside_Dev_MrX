@@ -1,5 +1,6 @@
 package com.mpapps.clientside_dev_mrx.View;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -15,12 +16,13 @@ import com.google.android.gms.maps.model.LatLng;
 import com.mpapps.clientside_dev_mrx.Models.TravelMode;
 import com.mpapps.clientside_dev_mrx.R;
 import com.mpapps.clientside_dev_mrx.Services.CurrentGameInstance;
-import com.mpapps.clientside_dev_mrx.Services.GoogleMapsAPIManager;
 
 import java.util.Map;
 
 public class CreateRouteFragment extends DialogFragment
 {
+    private OnCreateRouteListener listener;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState)
@@ -58,8 +60,26 @@ public class CreateRouteFragment extends DialogFragment
             if(misterXLocation == null)
                 Toast.makeText(getContext(), getString(R.string.toast_no_location_available) + "Mister X", Toast.LENGTH_SHORT).show();
             else
-                GoogleMapsAPIManager.getInstance(getActivity().getApplication()).calculateRoute(misterXLocation, travelMode);
+                listener.OnCreateRoute(misterXLocation, travelMode);
+
+
             dismiss();
         });
+    }
+
+    @Override
+    public void onAttach(Context context)
+    {
+        super.onAttach(context);
+        if (context instanceof OnCreateRouteListener) {
+            listener = (OnCreateRouteListener) context;
+        } else {
+            throw new RuntimeException(context.toString()
+                    + " must implement OnCodeInputListener");
+        }
+    }
+
+    public interface OnCreateRouteListener{
+        void OnCreateRoute(LatLng latLng, TravelMode travelMode);
     }
 }

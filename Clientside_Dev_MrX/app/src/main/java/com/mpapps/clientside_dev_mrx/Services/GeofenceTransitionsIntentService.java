@@ -1,29 +1,24 @@
 package com.mpapps.clientside_dev_mrx.Services;
 
-import android.app.IntentService;
+import android.content.Context;
 import android.content.Intent;
+import android.support.annotation.NonNull;
+import android.support.v4.app.JobIntentService;
 
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingEvent;
 import com.mpapps.clientside_dev_mrx.R;
 
-import org.jetbrains.annotations.Nullable;
-
 import java.util.List;
 
-public class GeofenceTransitionsIntentService extends IntentService
+public class GeofenceTransitionsIntentService extends JobIntentService
 {
-    public GeofenceTransitionsIntentService(String name)
-    {
-        super(name);
-    }
-
-    public GeofenceTransitionsIntentService(){
-        super("GeofenceTransitionsIntentService");
+    public static void enqueuWork(Context context, Intent intent){
+        enqueueWork(context, GeofenceTransitionsIntentService.class, 573, intent);
     }
 
     @Override
-    protected void onHandleIntent(@Nullable Intent intent)
+    protected void onHandleWork(@NonNull Intent intent)
     {
         GeofencingEvent geofencingEvent = GeofencingEvent.fromIntent(intent);
         if (geofencingEvent.hasError()) {

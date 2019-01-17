@@ -39,6 +39,7 @@ public class NewGameActivity extends AppCompatActivity {
     private ArrayList<String> gameCodeList;
     private String gameCode;
     private boolean exists;
+    private ValueEventListener valueEventListener;
 
     @Override
 
@@ -111,6 +112,7 @@ public class NewGameActivity extends AppCompatActivity {
                 editor.putBoolean("countdown_timer_finish", true).apply();
                 editor.putString("data", "").apply();
 
+                mDatabase.removeEventListener(valueEventListener);
                 Intent returnIntent = new Intent();
                 returnIntent.putExtra("new_game_name", editText.getText().toString());
                 returnIntent.putExtra("new_game_mode", adapter.getLastSelectedPos());
@@ -152,7 +154,7 @@ public class NewGameActivity extends AppCompatActivity {
 
     private void getGameCodes() {
 
-        mDatabase.child("gamecodes").addValueEventListener(new ValueEventListener() {
+        valueEventListener = new ValueEventListener() {
 
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -164,7 +166,8 @@ public class NewGameActivity extends AppCompatActivity {
             public void onCancelled(@NonNull DatabaseError databaseError) {
 
             }
-        });
+        };
+        mDatabase.child("gamecodes").addValueEventListener(valueEventListener);
     }
 
     private String generateGamecode() {
@@ -177,4 +180,6 @@ public class NewGameActivity extends AppCompatActivity {
         Log.i("NewGameActivity", gameCode);
         return gameCode;
     }
+
+
 }

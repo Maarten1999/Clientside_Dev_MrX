@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Clientside_Dev_MrX</string>
+    <string name="app_name">Mister X</string>
     <string name="channel_id" translatable="false">Clientside_Dev_MrX</string>
     <string name="channel_description" translatable="false">the channel tat receives messages</string>
     <string name="gamemode_easy_description">Playing time: 15 min - GPS Tracker: 2 min</string>

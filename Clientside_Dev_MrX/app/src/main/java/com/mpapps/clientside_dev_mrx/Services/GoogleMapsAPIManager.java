@@ -102,7 +102,7 @@ public class GoogleMapsAPIManager
                 == PackageManager.PERMISSION_GRANTED &&
                 ActivityCompat.checkSelfPermission(application, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 20, locationListenerGPS);
-            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 5000, 20, locationListenerNetwork);
+            //locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 5000, 20, locationListenerNetwork);
         }
     }
 

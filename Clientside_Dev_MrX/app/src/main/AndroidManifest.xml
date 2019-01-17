@@ -6,6 +6,8 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
 
     <application
         android:allowBackup="true"
@@ -30,7 +32,9 @@
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
-        <service android:name=".Services.GeofenceTransitionsIntentService" />
+        <service android:name=".Services.GeofenceTransitionsIntentService"
+            android:exported="true"
+            android:permission="android.permission.BIND_JOB_SERVICE"/>
         <service android:name=".Services.TimerService" />
 
         <meta-data
@@ -49,6 +53,14 @@
         </activity>
         <activity android:name=".View.DetailedGameActivity" />
         <activity android:name=".View.WaitForStartActivity"></activity>
+
+        <receiver
+            android:name=".Services.GeofenceBroadcastReceiver"
+            android:exported="true" >
+            <!--<intent-filter>-->
+                <!--<action android:name="com.mpapps.clientside_dev_mrx.Services.GeofenceBroadcastReceiver.ACTION_RECEIVE_GEOFENCE"/>-->
+            <!--</intent-filter>-->
+        </receiver>
     </application>
 
 </manifest>

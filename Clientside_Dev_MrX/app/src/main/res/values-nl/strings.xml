@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Clientside_Dev_MrX</string>
+    <string name="app_name">Mister X</string>
     <string name="gamemode_easy_description">Speelduur: 15 min - GPS Tracker: 2 min</string>
     <string name="gamemode_normal_description">Speelduur: 1 uur - GPS Tracker: 5 min</string>
     <string name="gamemode_hard_description">Speelduur: 2 uur - GPS Tracker: 10 min</string>

@@ -19,6 +19,8 @@ import com.mpapps.clientside_dev_mrx.Services.CurrentGameInstance;
 public class WaitForStartActivity extends AppCompatActivity {
 
     String gamecode;
+    DatabaseReference reference;
+    ValueEventListener valueEventListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,8 +29,8 @@ public class WaitForStartActivity extends AppCompatActivity {
 
         gamecode = CurrentGameInstance.getInstance().getGameCode().getValue();
 
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("games/" + gamecode);
-        reference.addValueEventListener(new ValueEventListener() {
+        reference = FirebaseDatabase.getInstance().getReference("games/" + gamecode);
+        valueEventListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 int gameState = Integer.parseInt(dataSnapshot.child("gamestate").getValue(String.class));
@@ -46,7 +48,8 @@ public class WaitForStartActivity extends AppCompatActivity {
             public void onCancelled(@NonNull DatabaseError databaseError) {
 
             }
-        });
+        };
+        reference.addValueEventListener(valueEventListener);
     }
 
     @Override
@@ -56,5 +59,12 @@ public class WaitForStartActivity extends AppCompatActivity {
         String username = sharedpref.getString("displayname", "");
         DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("games/"+gamecode+"/players");
         databaseReference.child(username).removeValue();
+    }
+
+    @Override
+    protected void onDestroy()
+    {
+        reference.removeEventListener(valueEventListener);
+        super.onDestroy();
     }
 }
