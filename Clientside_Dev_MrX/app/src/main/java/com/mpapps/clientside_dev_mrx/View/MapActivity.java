@@ -92,7 +92,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private int FinishResultCode;
     private static final int GPS_REQUEST = 1;
 
-    String misterX;
+    String misterX, username;
     Intent intent_service;
 
     SharedPreferences mPref;
@@ -108,6 +108,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
+
+        SharedPreferences sharedPreferences = getSharedPreferences(getString(R.string.sharedPreferences), MODE_PRIVATE);
+        username = sharedPreferences.getString("displayname", "");
 
         viewModel = ViewModelProviders.of(this).get(MapActivityVM.class);
         geofencingClient = LocationServices.getGeofencingClient(this);
@@ -143,8 +146,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 if(gameStateInt > GameState.Started.ordinal()){
                     int code;
                     boolean isMisterX;
-                    if (CurrentGameInstance.getInstance().getGameModel().getValue().getPlayers()
-                            .get(FirebaseAuth.getInstance().getCurrentUser().getDisplayName())) {
+                    if (username.equals(misterX)) {
                         isMisterX = true;
                     } else {
                         isMisterX = false;
@@ -281,8 +283,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             if (isFinished) {
                 int code;
                 GameState gameState;
-                if (CurrentGameInstance.getInstance().getGameModel().getValue().getPlayers()
-                        .get(FirebaseAuth.getInstance().getCurrentUser().getDisplayName())) {
+                if (username.equals(misterX)) {
                     Toast.makeText(getApplicationContext(), "You have escaped!", Toast.LENGTH_SHORT).show();
                     code = Constants.MAPACTIVITY_GAME_WON_CODE;
                     gameState = GameState.Won;
@@ -346,9 +347,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         });
 
         fab_misterx.setOnClickListener(view -> {
-            SharedPreferences sharedPreferences = getSharedPreferences(getString(R.string.sharedPreferences), MODE_PRIVATE);
-            String username = sharedPreferences.getString("displayname", "");
-
 
             FragmentManager fragmentManager = getSupportFragmentManager();
             Fragment fragment = fragmentManager.findFragmentById(R.id.map_activity_fragment_placeholder);
